@@ -28,6 +28,7 @@
 
 #include "def.h"
 #include "macroses.h"
+#include "init_periph.h"
 #include "led.h"
 
 

@@ -14,7 +14,8 @@
 #include "main.h"
 
 
-#define SYS_TICK_THOLD 240
+#define SYS_TICK_THOLD  194
+#define SEC_TICK_MASK   0x03ff
 
 
 /* Flags definitions */

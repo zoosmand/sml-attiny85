@@ -25,6 +25,7 @@ static void Second_Handler(void);
 int main(void) {
   /* Initialization block */
   cli();
+  _INIT_MCU;
   _INIT_WDG;
   _INIT_LED;
   _INIT_TIMERS;
@@ -47,9 +48,9 @@ static void Cron_Handler(void) {
   cli();
   if (FLAG_CHECK(_GREG_, _SYSTF_)) {
     FLAG_CLR(_GREG_, _SYSTF_);
+    sysCnt &= SEC_TICK_MASK;
 
-    if (sysCnt >= 1000) {
-      sysCnt = 0;
+    if (!sysCnt) {
       secCnt++;
       FLAG_SET(_GREG_, _SECTF_);
     }
