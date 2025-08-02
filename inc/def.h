@@ -1,0 +1,25 @@
+/*
+ * Filename: def.h
+ * Description: A set of common definitions. 
+ *
+ * Project: Simple Multitasking Logic
+ * Platform: MicroChip ATTiny85
+ * Created: 02.08.2025 9:53:17 AM
+ * Author : Dmitry Slobodchikov
+*/ 
+#ifndef DEF_H_
+#define DEF_H_
+
+
+#include "main.h"
+
+
+#define SYS_TICK_THOLD 240
+
+
+/* Flags definitions */
+#define _SYSTF_   0 // System Tick Flag
+#define _SECTF_   1 // Seconds Tick Flag
+
+
+#endif /* DEF_H_ */

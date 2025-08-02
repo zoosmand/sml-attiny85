@@ -1,0 +1,17 @@
+*.atsln
+*.asmproj
+*.atsuo
+*.xml
+*.tmp
+*.obj
+*.lss
+*.map
+*.elf
+*.srec
+*.eep
+*.cproj
+Debug/Makefile
+Debug/*.mk
+Debug/*.d
+Debug/*.o
+.vs
