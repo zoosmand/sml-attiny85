@@ -76,10 +76,10 @@ static void Second_Handler(void) {
  * @retval  none
  */
 static void LedToggle_Handler(void) {
-  if (LEDPIN & (1 << LED0PIN)) {
-    LEDPORT &= ~(1 << LED0PIN);
+  if (LEDPIN & _BV(LED0PIN)) {
+    LEDPORT &= ~_BV(LED0PIN);
   } else {
-    LEDPORT |= (1 << LED0PIN);
+    LEDPORT |= _BV(LED0PIN);
   }
 }
 
