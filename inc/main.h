@@ -28,7 +28,7 @@
 
 #include "def.h"
 #include "macroses.h"
-#include "init_led.h"
+#include "led.h"
 
 
 /* Exported functions */

@@ -16,7 +16,6 @@ static volatile uint16_t  secCnt  = 0;
 
 static void Cron_Handler(void);
 static void Second_Handler(void);
-static void LedToggle_Handler(void);
 
 
 /**
@@ -69,20 +68,6 @@ static void Second_Handler(void) {
     LedToggle_Handler();
   }
 }
-
-
-/**
- * @brief   The toggling LED handler.
- * @retval  none
- */
-static void LedToggle_Handler(void) {
-  if (LEDPIN & _BV(LED0PIN)) {
-    LEDPORT &= ~_BV(LED0PIN);
-  } else {
-    LEDPORT |= _BV(LED0PIN);
-  }
-}
-
 
 
 /* Getters */

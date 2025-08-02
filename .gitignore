@@ -12,6 +12,6 @@
 *.cproj
 Debug/Makefile
 Debug/*.mk
-Debug/*.d
-Debug/*.o
+*.d
+*.o
 .vs
