@@ -14,12 +14,12 @@
 
 
 #ifndef F_CPU
-#define F_CPU 16000000UL
+#define F_CPU 16000000
 #endif
 
 
 #include <avr/io.h>
-#include <util/delay.h>
+// #include <util/delay.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <avr/pgmspace.h>
@@ -31,6 +31,7 @@
 #include "init_periph.h"
 #include "led.h"
 #include "i2c.h"
+#include "display.h"
 
 
 /* Exported functions */
@@ -39,6 +40,7 @@ volatile uint16_t* Get_SysCnt(void);
 volatile uint16_t Get_SecCnt(void);
 
 void Init_ISR(void);
+void _delay_us(uint16_t);
 
 
 #endif /* MAIN_H_ */

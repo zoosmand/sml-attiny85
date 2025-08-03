@@ -23,12 +23,22 @@ static void I2C_TransferBuffer(void);
  */
 void I2C_Start(void) {
   SCL_H;
-  _delay_us(4);
+  // _delay_us(4);
+  _NOP;
+  _NOP;
+  _NOP;
+  _NOP;
+  _NOP;
+  _NOP;
   SDA_L;
-  _delay_us(4);
+  // _delay_us(4);
+  _NOP;
+  _NOP;
+  _NOP;
+  _NOP;
   SCL_L;
   SDA_H;
-  USISR |= (1 << USISIF);
+  USISR |= _BV(USISIF);
 }
 
 
@@ -40,10 +50,19 @@ void I2C_Stop(void) {
   USIDR = 0x80;
   SDA_L;
   SCL_H;
-  while (!(I2CPIN & (1 << I2CSCL)));
-  _delay_us(4);
+  while (!(I2CPIN & _BV(I2CSCL)));
+  // _delay_us(4);
+  _NOP;
+  _NOP;
+  _NOP;
+  _NOP;
+
   SDA_H;
-  _delay_us(4);
+  // _delay_us(4);
+  _NOP;
+  _NOP;
+  _NOP;
+  _NOP;
   USISR |= (1 << USISIF);
 }
 
@@ -57,11 +76,20 @@ static void I2C_TransferBuffer(void) {
 
   tmp = USICR;
   tmp |= (1 << USITC);
-  while (!(USISR & (1 << USIOIF))) {
-    _delay_us(4);
+  while (!(USISR & _BV(USIOIF))) {
+    // _delay_us(4);
+    _NOP;
+    _NOP;
+    _NOP;
+    _NOP;
+    _NOP;
     USICR = tmp;
-    while (!(I2CPIN & (1 << I2CSCL)));
-    _delay_us(4);
+    while (!(I2CPIN & _BV(I2CSCL)));
+    // _delay_us(4);
+    _NOP;
+    _NOP;
+    _NOP;
+    _NOP;
     USICR = tmp;
   }
   _delay_us(6);
@@ -76,8 +104,8 @@ void I2C_Transfer(void) {
   SCL_L;
   uint8_t tmp = 0;
   tmp = USISR;
-  tmp |= (1 << USIOIF);
-  tmp &= ~(0xe << USICNT0);
+  tmp |= _BV(USIOIF);
+  tmp &= ~(0xe<<USICNT0);
   USISR = tmp;
   
   I2C_TransferBuffer();
@@ -90,7 +118,7 @@ void I2C_Transfer(void) {
  */
 uint8_t I2C_ReceiveAckNack(void) {
   SDA_IN;
-  USISR |= ((1 << USIOIF)|(0xe << USICNT0));
+  USISR |= _BV(USIOIF)|(0xe<<USICNT0);
   USIDR = 0;
   I2C_TransferBuffer();
   SDA_OUT;
@@ -104,7 +132,7 @@ uint8_t I2C_ReceiveAckNack(void) {
  */
 void I2C_SendAckNack(void) {
   SDA_OUT;
-  USISR |= (1 << USIOIF)|(0xe << USICNT0);
+  USISR |= _BV(USIOIF)|(0xe<<USICNT0);
   
   if (FLAG_CHECK(_I2CREG_, _ACKF_)) {
     USIDR = 0x00;
@@ -121,7 +149,7 @@ void I2C_SendAckNack(void) {
  * @retval  none
  */
 void I2C_SendAddress(uint8_t addr) {
-  if (!(FLAG_CHECK(_I2CREG_, _WRF_))) {
+  if (FLAG_CHECK(_I2CREG_, _WRF_)) {
     addr |= 0x01;
   }
   I2C_SendByte(addr);
@@ -136,10 +164,10 @@ void I2C_SendAddress(uint8_t addr) {
 void I2C_SendByte(uint8_t byte) {
   USIDR = byte;
   I2C_Transfer();
-  if (I2C_ReceiveAckNack()) {
-    FLAG_SET(_I2CREG_, _BEF_);
-    I2C_Stop();
-  }
+  // if (I2C_ReceiveAckNack()) {
+  //   FLAG_SET(_I2CREG_, _BEF_);
+  //   I2C_Stop();
+  // }
 }
 
 
