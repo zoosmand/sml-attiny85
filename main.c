@@ -29,6 +29,7 @@ int main(void) {
   _INIT_WDG;
   _INIT_LED;
   _INIT_TIMERS;
+  _INIT_I2C;
   Init_ISR();
   sei();
 

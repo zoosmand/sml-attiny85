@@ -50,4 +50,14 @@
 } while (0)
 
 
+/* --- I2C --- */
+#define	_INIT_I2C do { \
+  I2CPORT |= _BV(I2CSDA)|_BV(I2CSCL); \
+  I2CDDR  |= _BV(I2CSDA)|_BV(I2CSCL); \
+  USIDR   = 0xff; \
+  USICR   = _BV(USIWM1)|_BV(USICS1)|_BV(USICLK); \
+  USISR   = _BV(USISIF)|_BV(USIOIF)|_BV(USIPF); \
+} while (0)
+
+
 #endif /* INIT_PERIPH_H_ */
