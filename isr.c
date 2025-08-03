@@ -42,5 +42,5 @@ ISR(TIMER0_OVF_vect) {
  */
 ISR(WDT_vect) {
   wdt_reset();
-  WDTCR |= (1<<WDCE)|(1<<WDIE);
+  WDTCR |= _BV(WDCE)|_BV(WDIE);
 }

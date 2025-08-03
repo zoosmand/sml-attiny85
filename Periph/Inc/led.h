@@ -1,17 +1,18 @@
 /*
- * Filename: init_led.h
+ * Filename: led.h
  * Description: A set of definitions for LED implementation. 
  *
  * Project: Simple Multitasking Logic
  * Platform: MicroChip ATTiny85
- * Created: 02.08.2025 9:53:17 AM
+ * Created: 02.08.2025 11:02:27 PM
  * Author : Dmitry Slobodchikov
 */ 
-#ifndef LED_INIT_H_
-#define LED_INIT_H_
+#ifndef LED_H_
+#define LED_H_
 
 
 #include "main.h"
+
 
 
 #define LEDDDR    DDRB
@@ -19,9 +20,7 @@
 #define LEDPIN    PINB
 #define LED0PIN   PINB1
 
-#define	_INIT_LED do { \
-  LEDDDR |= _BV(LED0PIN); \
-} while (0)
+void LedToggle_Handler(void);
 
 
-#endif /* LED_INIT_H_ */
+#endif /* LED_H_ */

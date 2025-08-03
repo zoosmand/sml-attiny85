@@ -28,7 +28,9 @@
 
 #include "def.h"
 #include "macroses.h"
-#include "init_led.h"
+#include "init_periph.h"
+#include "led.h"
+#include "i2c.h"
 
 
 /* Exported functions */

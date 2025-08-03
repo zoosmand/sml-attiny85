@@ -16,7 +16,6 @@ static volatile uint16_t  secCnt  = 0;
 
 static void Cron_Handler(void);
 static void Second_Handler(void);
-static void LedToggle_Handler(void);
 
 
 /**
@@ -26,9 +25,11 @@ static void LedToggle_Handler(void);
 int main(void) {
   /* Initialization block */
   cli();
+  _INIT_MCU;
   _INIT_WDG;
   _INIT_LED;
   _INIT_TIMERS;
+  _INIT_I2C;
   Init_ISR();
   sei();
 
@@ -48,9 +49,9 @@ static void Cron_Handler(void) {
   cli();
   if (FLAG_CHECK(_GREG_, _SYSTF_)) {
     FLAG_CLR(_GREG_, _SYSTF_);
+    sysCnt &= SEC_TICK_MASK;
 
-    if (sysCnt >= 1000) {
-      sysCnt = 0;
+    if (!sysCnt) {
       secCnt++;
       FLAG_SET(_GREG_, _SECTF_);
     }
@@ -69,20 +70,6 @@ static void Second_Handler(void) {
     LedToggle_Handler();
   }
 }
-
-
-/**
- * @brief   The toggling LED handler.
- * @retval  none
- */
-static void LedToggle_Handler(void) {
-  if (LEDPIN & (1 << LED0PIN)) {
-    LEDPORT &= ~(1 << LED0PIN);
-  } else {
-    LEDPORT |= (1 << LED0PIN);
-  }
-}
-
 
 
 /* Getters */
