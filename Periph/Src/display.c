@@ -13,6 +13,7 @@
 /* Private variables */
 static volatile uint8_t _DSPLREG_ = 0;
 static uint8_t diplPrintPos       = 0;
+volatile static uint8_t* _i2creg;
 
 /* Private costantc */
 const uint8_t wh1602InitParams[8] PROGMEM = {
@@ -54,12 +55,14 @@ static uint16_t WH1602_I2C_BufferLength(const char*);
  * @retval None
  */
 void WH1602_I2C_Init(void) {
+
+  _i2creg = Get_I2CREG();
   
   /* Initial delay according 1602a documentation */
   _delay_us(15000);
  
   /* Initial parameter-delay pairs */
-  
+  I2C_WRITE;
   I2C_Start();
   I2C_SendAddress(_1602A_ADDR_);
   for(uint8_t i = 0; i < sizeof(wh1602InitParams); i++) {
@@ -79,6 +82,7 @@ void WH1602_I2C_Init(void) {
  * @retval None
  */
 void WH1602_WriteChar(uint8_t ch) {
+  I2C_WRITE;
   I2C_SendByte(_WR1NCHAR(ch));
   I2C_SendByte(_WR2NCHAR(ch));
   I2C_SendByte(_WR1NCHAR(ch << 4));
@@ -94,6 +98,7 @@ void WH1602_WriteChar(uint8_t ch) {
  * @retval None
  */
 void WH1602_WriteCommand(uint8_t cmd, uint16_t delay) {  
+  I2C_WRITE;
   I2C_SendByte(_WR1NCMD(cmd));
   I2C_SendByte(_WR2NCMD(cmd));
   I2C_SendByte(_WR1NCMD(cmd << 4));
@@ -127,6 +132,7 @@ static uint16_t WH1602_I2C_BufferLength(const char* buf) {
  */
 void WH1602_I2C_Write(uint8_t line, uint8_t extraCmd, const char* buf) {
   
+  I2C_WRITE;
   I2C_Start();
   I2C_SendAddress(_1602A_ADDR_);
 
@@ -175,6 +181,7 @@ void WH1602_I2C_Write(uint8_t line, uint8_t extraCmd, const char* buf) {
  * @retval None
  */
 void PrintCharDisplay(char ch, uint8_t dspl){
+  I2C_WRITE;
   if ((FLAG_CHECK(_DSPLREG_, _0DCF_)) && (FLAG_CHECK(_DSPLREG_, _0ACF_))) {
     FLAG_CLR(_DSPLREG_, _0DCF_);
     FLAG_CLR(_DSPLREG_, _0ACF_);

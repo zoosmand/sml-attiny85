@@ -21,9 +21,6 @@ void _delay_us(uint16_t delay) {
     _NOP;
     _NOP;
     _NOP;
-    _NOP;
-    _NOP;
-    // _NOP;
     delay--;
   }
 }

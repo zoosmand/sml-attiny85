@@ -20,7 +20,7 @@ void WH1602_I2C_Read(uint16_t, uint8_t*);
 void PrintCharDisplay(char, uint8_t);
 
 /* --- WH0802A commands --- */
-#define _1602A_ADDR_        0x27<<1 // WH1602 I2C Address
+#define _1602A_ADDR_        0x27 // WH1602 I2C Address
 #define _1602A_8BBUS_       0x03 // 8-bit initial bus initialization
 #define _1602A_CURUPLEFT_   0x02 // Cursor positioin up an left
 #define	_1602A_4BBUS2L_     0x28 // 4-bit bus, LCD of 2 lines

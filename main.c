@@ -69,6 +69,8 @@ static void Second_Handler(void) {
   if (FLAG_CHECK(_GREG_, _SECTF_)) {
     FLAG_CLR(_GREG_, _SECTF_);
     LedToggle_Handler();
+    WH1602_I2C_Write(1, _1602A_NOCMD_, "12345");
+    WH1602_I2C_Write(2, _1602A_NOCMD_, "QWErt");
   }
 }
 
