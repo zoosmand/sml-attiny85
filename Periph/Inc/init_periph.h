@@ -5,7 +5,7 @@
  * Project: Simple Multitasking Logic
  * Platform: MicroChip ATTiny85
  * Created: 02.08.2025 8:40:57 PM
- * Author : Dmitry Slobodchikov
+ * Author: Dmitry Slobodchikov
 */ 
 #ifndef INIT_PERIPH_H_
 #define INIT_PERIPH_H_

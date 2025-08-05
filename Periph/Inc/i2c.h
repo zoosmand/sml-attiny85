@@ -5,7 +5,7 @@
  * Project: Simple Multitasking Logic
  * Platform: MicroChip ATTiny85
  * Created: 02.08.2025 11:05:17 PM
- * Author : Dmitry Slobodchikov
+ * Author: Dmitry Slobodchikov
  */
 #ifndef I2C_H_
 #define I2C_H_
@@ -14,9 +14,9 @@
 
 
 /* Flags definitions */
-#define _ACKF_    0 // ACK/NACK Flag
-#define _WRF_     1 // Write Flag
-#define _BEF_     2 // Bus Error Flag
+#define _I2C_ACKF_    0 // ACK/NACK Flag
+#define _I2C_RWF_     1 // Read/Write Flag (0 - write, 1 - read)
+#define _I2C_BEF_     2 // Bus Error Flag
 
 
 #define I2CDDR    DDRB
@@ -33,6 +33,11 @@
 
 #define	SDA_OUT   I2CDDR |= _BV(I2CSDA)
 #define	SDA_IN    I2CDDR &= ~_BV(I2CSDA)
+
+#define	I2C_WRITE FLAG_CLR(*_i2creg, _I2C_RWF_)
+#define	I2C_READ  FLAG_SET(*_i2creg, _I2C_RWF_)
+
+
 
 
 void I2C_Start(void);
