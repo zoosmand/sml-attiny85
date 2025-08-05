@@ -12,20 +12,21 @@
 #define _DISPLAY_H
 
 #include "main.h"
+
+// #define DSPL_DSS1615
+#define DSPL_WH1602
    
 /* Exported functions prototypes */
-void WH1602_I2C_Init(void);
-void WH1602_I2C_Write(uint8_t, uint8_t, const char*);
-void WH1602_I2C_Read(uint16_t, uint8_t*);
+void Init_Display(void);
 int putc_dspl(char, FILE*);
-// int uart_putchar(char c, FILE *stream);
+void WH1602_Write(uint8_t, uint8_t, const char*);
+
 
 /* --- WH0802A commands --- */
 #define _1602A_ADDR_        0x27 // WH1602 I2C Address
 #define _1602A_8BBUS_       0x03 // 8-bit initial bus initialization
 #define _1602A_CURUPLEFT_   0x02 // Cursor positioin up an left
 #define	_1602A_4BBUS2L_     0x28 // 4-bit bus, LCD of 2 lines
-// #define	_1602A_4BBUS2L_     0x20 // 4-bit bus, LCD of 1 line inverted
 #define _1602A_DSPLSW_	    0x0c // Display on, cursor off, blink off
 #define _1602A_CLRDSLP_     0x01 // Clear display
 #define _1602A_1LS_         0x80 // Position at 1-st line, start 

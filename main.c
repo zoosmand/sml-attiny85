@@ -34,7 +34,7 @@ int main(void) {
   _INIT_TIMERS;
   _INIT_I2C;
   Init_ISR();
-  WH1602_I2C_Init();
+  Init_Display();
   sei();
 
   while (1) {
