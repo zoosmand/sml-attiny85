@@ -5,7 +5,7 @@
  * Project: Simple Multitasking Logic
  * Platform: MicroChip ATTiny85
  * Created: 03.08.2025 11:37:29 AM
- * Author : Dmitry Slobodchikov
+ * Author: Dmitry Slobodchikov
  */ 
 
 #include "main.h"

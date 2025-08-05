@@ -5,7 +5,7 @@
  * Project: Simple Multitasking Logic
  * Platform: MicroChip ATTiny85
  * Created: 03.08.2025 10:38:01 AM
- * Author : Dmitry Slobodchikov
+ * Author: Dmitry Slobodchikov
  */
 
 #include "display.h"
@@ -38,12 +38,14 @@ const uint16_t wh1602InitDelays[8] PROGMEM = {
   40
 }; 
 
-/* Private function prototypes -----------------------------------------------*/
+/* Private function prototypes */
 static void WH1602_WriteChar(uint8_t);
 static void WH1602_WriteCommand(uint8_t, uint16_t);
 // static void WH1602_I2C_ReadByte(uint8_t);
 // static void WH1602_I2C_Read(uint16_t, uint8_t*);
 static uint16_t WH1602_I2C_BufferLength(const char*);
+
+
 
 
 
@@ -77,8 +79,8 @@ void WH1602_I2C_Init(void) {
 
 
 /**
- * @brief  Writes/Sends a charachter symbol to WH1602A display
- * @param  ch: ACSII charachter
+ * @brief  Writes/Sends a character symbol to WH1602A display
+ * @param  ch: ACSII character
  * @retval None
  */
 void WH1602_WriteChar(uint8_t ch) {
@@ -109,7 +111,7 @@ void WH1602_WriteCommand(uint8_t cmd, uint16_t delay) {
 
 /**
  * @brief  Writes/Sends a command to WH1602A display
- * @param  buf: pointer to the charachter/text buffer
+ * @param  buf: pointer to the character/text buffer
  * @retval The buffer length 
  */
 static uint16_t WH1602_I2C_BufferLength(const char* buf) {
@@ -127,7 +129,7 @@ static uint16_t WH1602_I2C_BufferLength(const char* buf) {
  * @brief  Writes/Sends a text buffer to WH1602A display
  * @param  line: 1602a display line [1,2]
  * @param  extraCmd: extra 1602a command, e.g. clear display
- * @param  buf: pointer to the charachter/text buffer
+ * @param  buf: pointer to the character/text buffer
  * @retval None
  */
 void WH1602_I2C_Write(uint8_t line, uint8_t extraCmd, const char* buf) {
@@ -166,7 +168,7 @@ void WH1602_I2C_Write(uint8_t line, uint8_t extraCmd, const char* buf) {
 // /**
 //  * @brief  Reads a text buffer from WH1602A display
 //  * @param  bufLen: received buffer length
-//  * @param  buf: pointer to the charachter/text buffer to receive
+//  * @param  buf: pointer to the character/text buffer to receive
 //  * @retval None
 //  */
 // static void WH1602_I2C_Read(uint16_t bufLen, uint8_t* buf) {
@@ -175,14 +177,15 @@ void WH1602_I2C_Write(uint8_t line, uint8_t extraCmd, const char* buf) {
 
 
 /**
- * @brief  Writes/Sends cgarachter to the given display
- * @param  ch: charachter to write
- * @param  dspl: display index #TODO define desctop selection
- * @retval None
+ * @brief  Writes/Sends character to the given display
+ * @param  ch: character to write
+ * @param  stream: Standard stream
+ * @retval (int) status
  */
-void PrintCharDisplay(char ch, uint8_t dspl){
+int putc_dspl(char ch, FILE *stream){
+  // if (ch == '\n') putc_dspl('\r', stream);
   I2C_WRITE;
-  if ((FLAG_CHECK(_DSPLREG_, _0DCF_)) && (FLAG_CHECK(_DSPLREG_, _0ACF_))) {
+  if ((FLAG_CHECK(_DSPLREG_, _0DCF_)) || (FLAG_CHECK(_DSPLREG_, _0ACF_))) {
     FLAG_CLR(_DSPLREG_, _0DCF_);
     FLAG_CLR(_DSPLREG_, _0ACF_);
 
@@ -208,4 +211,6 @@ void PrintCharDisplay(char ch, uint8_t dspl){
   if (ch == 0x0a) FLAG_SET(_DSPLREG_, _0DCF_);
   if (ch == 0x0d) FLAG_SET(_DSPLREG_, _0ACF_);
 
+  return 0;
 }
+

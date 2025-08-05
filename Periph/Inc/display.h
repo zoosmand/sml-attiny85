@@ -17,7 +17,8 @@
 void WH1602_I2C_Init(void);
 void WH1602_I2C_Write(uint8_t, uint8_t, const char*);
 void WH1602_I2C_Read(uint16_t, uint8_t*);
-void PrintCharDisplay(char, uint8_t);
+int putc_dspl(char, FILE*);
+// int uart_putchar(char c, FILE *stream);
 
 /* --- WH0802A commands --- */
 #define _1602A_ADDR_        0x27 // WH1602 I2C Address

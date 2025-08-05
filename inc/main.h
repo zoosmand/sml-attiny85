@@ -5,7 +5,7 @@
  * Project: Simple Multitasking Logic
  * Platform: MicroChip ATTiny85
  * Created: 02.08.2025 9:53:17 AM
- * Author : Dmitry Slobodchikov
+ * Author: Dmitry Slobodchikov
 */ 
 
 
@@ -20,6 +20,7 @@
 
 #include <avr/io.h>
 // #include <util/delay.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <avr/pgmspace.h>

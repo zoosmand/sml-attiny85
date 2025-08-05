@@ -5,7 +5,7 @@
  * Project: Simple Multitasking Logic
  * Platform: MicroChip ATTiny85
  * Created: 02.08.2025 11:05:17 PM
- * Author : Dmitry Slobodchikov
+ * Author: Dmitry Slobodchikov
  */
 
 #include "i2c.h"
@@ -23,11 +23,9 @@ static void I2C_TransferBuffer(void);
  */
 void I2C_Start(void) {
   SCL_H;
-  // _delay_us(4);
-  _NOP;_NOP;_NOP;_NOP;_NOP;
+  _delay_us(4);
   SDA_L;
-  // _delay_us(4);
-  _NOP;_NOP;_NOP;_NOP;
+  _delay_us(4);
   SCL_L;
   SDA_H;
   USISR |= _BV(USISIF);
@@ -43,11 +41,9 @@ void I2C_Stop(void) {
   SDA_L;
   SCL_H;
   while (!(I2CPIN & _BV(I2CSCL)));
-  _NOP;_NOP;_NOP;_NOP;
-  // _delay_us(4);
+  _delay_us(4);
   SDA_H;
-  _NOP;_NOP;_NOP;_NOP;
-  // _delay_us(4);
+  _delay_us(4);
   USISR |= _BV(USIPF);
   // USISR |= _BV(USISIF);
 }
@@ -62,18 +58,14 @@ static void I2C_TransferBuffer(void) {
 
   tmp = USICR;
   tmp |= _BV(USITC);
-  // USICR |= _BV(USITC);
   while (!(USISR & _BV(USIOIF))) {
-    _NOP;_NOP;_NOP;_NOP;
-    // _delay_us(4);
+    _delay_us(4);
     USICR = tmp;
     while (!(I2CPIN & _BV(I2CSCL)));
-    _NOP;_NOP;_NOP;_NOP;
-    // _delay_us(4);
+    _delay_us(4);
     USICR = tmp;
   }
-  _NOP;_NOP;_NOP;_NOP;_NOP;
-  // _delay_us(6);
+  _delay_us(6);
   USIDR = 0xff;
   SDA_H;
 }

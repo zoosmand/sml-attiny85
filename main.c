@@ -5,7 +5,7 @@
  * Project: Simple Multitasking Logic
  * Platform: MicroChip ATTiny85
  * Created: 02.08.2025 9:53:17 AM
- * Author : Dmitry Slobodchikov
+ * Author: Dmitry Slobodchikov
  */ 
 
 #include "main.h"
@@ -16,6 +16,9 @@ static volatile uint16_t  secCnt  = 0;
 
 static void Cron_Handler(void);
 static void Second_Handler(void);
+
+static FILE dsplout = FDEV_SETUP_STREAM(putc_dspl, NULL, _FDEV_SETUP_WRITE);
+
 
 
 /**
@@ -69,8 +72,9 @@ static void Second_Handler(void) {
   if (FLAG_CHECK(_GREG_, _SECTF_)) {
     FLAG_CLR(_GREG_, _SECTF_);
     LedToggle_Handler();
-    WH1602_I2C_Write(1, _1602A_NOCMD_, "12345");
-    WH1602_I2C_Write(2, _1602A_NOCMD_, "QWErt");
+
+    stdout = &dsplout;
+    printf("%d\n", secCnt);
   }
 }
 
