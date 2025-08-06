@@ -30,6 +30,7 @@ static uint16_t Calc_BufferLength(const char*);
 #if defined(DSPL_SSD1315)
   static uint8_t SSD1315_I2C_Init(void);
   static uint8_t SSD1315_WriteCommand(uint8_t);
+  static uint8_t SSD1315_WriteData(uint8_t);
 #endif
 
 
@@ -60,7 +61,7 @@ static uint16_t Calc_BufferLength(const char*);
 
 
 #if defined(DSPL_SSD1315)
-  const uint8_t ssd1315InitParams[24] PROGMEM = {
+  const uint8_t ssd1315InitParams[23] PROGMEM = {
 	  0xae,       // turn off oled panel
 	  0xd5, 0x80, // set display clock divide ratio/oscillator frequency
 	  0xa8, 0xfc, // set multiples ratio(1to64)
@@ -73,8 +74,8 @@ static uint16_t Calc_BufferLength(const char*);
 	  0xd9, 0xf1, // set pre-charge period
 	  0xdb, 0x40, // set vcomh
 	  0xa4, 0xa6,
-	  0xaf,       // turn on oled panel
-	  0x00        // set low column address
+	  0xaf       // turn on oled panel
+	  // 0x00        // set low column address
   };
 #endif
 
@@ -149,6 +150,17 @@ void Init_Display(void) {
 #endif
 #if defined(DSPL_SSD1315)
   SSD1315_I2C_Init();
+
+  char buf[6]= {
+    0b00111110,
+    0b01000001,
+    0b01000001,
+    0b01000001,
+    0b00100010,
+    0b00000000
+  };
+
+  SSD1315_Write(buf);
 #endif
 }
 
@@ -207,6 +219,59 @@ static uint8_t SSD1315_WriteCommand(uint8_t cmd) {
   if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
     return 0;
   }
+  return 1;
+}
+
+
+/**
+ * @brief  Writes/Sends a data to SSD1315 display
+ * @param  data: ssd1315 data byte
+ * @retval (uint8_t) status of operation
+ */
+static uint8_t SSD1315_WriteData(uint8_t data) {
+  /* --- Send control byte --- */
+  uint8_t ctrl = 0;
+  ctrl &= ~_BV(_SSD1315_Co_);
+  ctrl |= _BV(_SSD1315_DC_);
+  I2C_SendByte(ctrl);
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
+    return 0;
+  }
+  /* --- Send data byte --- */
+  I2C_SendByte(data);
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
+    return 0;
+  }
+  return 1;
+}
+
+
+/**
+ * @brief  Writes/Sends a text buffer to SSD1315 display
+ * @param  buf: pointer to the character/text buffer
+ * @retval (uint8_t) status of operation
+ */
+uint8_t SSD1315_Write(char* buf) {
+  I2C_WRITE;
+  I2C_Start();
+  _delay_us(48);
+  I2C_SendAddress(_SSD1315_ADDR_);
+  /* --- Control ACK on sending address --- */
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
+    FLAG_SET(*_i2creg, _I2C_BERF_);
+    I2C_Stop();
+    return 0;
+  }
+  /* --- Send buffer data --- */
+  // uint16_t len = Calc_BufferLength(buf);
+  for (uint8_t i = 0; i < 6; i++) {
+    if (!SSD1315_WriteData(*(buf++))) {
+      FLAG_SET(*_i2creg, _I2C_BERF_);
+      I2C_Stop();
+      return 0;
+    }
+  }
+  I2C_Stop();
   return 1;
 }
 
@@ -294,9 +359,9 @@ void WH1602_Write(uint8_t line, uint8_t extraCmd, const char* buf) {
   uint8_t dsplAddr = (line == 2) ? _1602A_2LS_ : _1602A_1LS_;
   WH1602_WriteCommand(dsplAddr, 40);
   
-  uint32_t len = Calc_BufferLength(buf);
+  uint16_t len = Calc_BufferLength(buf);
   
-  for(uint32_t i = 0 ; i < len ; i++) {
+  for(uint16_t i = 0 ; i < len ; i++) {
     WH1602_WriteChar(*(buf++));
   }
   I2C_Stop();

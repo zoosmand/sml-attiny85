@@ -20,6 +20,7 @@
 void Init_Display(void);
 int putc_dspl(char, FILE*);
 void WH1602_Write(uint8_t, uint8_t, const char*);
+uint8_t SSD1315_Write(char*);
 
 
 /* --- WH0802A commands --- */
