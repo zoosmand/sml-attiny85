@@ -48,6 +48,8 @@ void WH1602_Write(uint8_t, uint8_t, const char*);
 
 /* --- SSD1315 commands --- */
 #define _SSD1315_ADDR_      0x3c // SSD1315 I2C Address
+#define _SSD1315_Co_        7 // Co bit
+#define _SSD1315_DC_        6 // DC bit (1 - data, 0 - command)
 
 /* --- Display end of line parameters --- */
 #define _0DCF_              0

@@ -28,7 +28,8 @@ static uint16_t Calc_BufferLength(const char*);
 #endif
 
 #if defined(DSPL_SSD1315)
-  static void SSD1315_I2C_Init(void);
+  static uint8_t SSD1315_I2C_Init(void);
+  static uint8_t SSD1315_WriteCommand(uint8_t);
 #endif
 
 
@@ -161,7 +162,7 @@ void Init_Display(void) {
  * @brief  Initializes WH1602A display
  * @retval None
  */
-void SSD1315_I2C_Init(void) {
+static uint8_t SSD1315_I2C_Init(void) {
  
   /* Initial delay according ssd1315 documentation */
   _delay_us(50000);
@@ -169,7 +170,44 @@ void SSD1315_I2C_Init(void) {
   I2C_Start();
   _delay_us(48);
   I2C_SendAddress(_SSD1315_ADDR_);
+  /* --- Control ACK on sending address --- */
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
+    FLAG_SET(*_i2creg, _I2C_BERF_);
+    I2C_Stop();
+    return 0;
+  }
+  /* --- Initialization commands --- */
+  for (uint8_t i = 0; i < sizeof(ssd1315InitParams); i++) {
+    if (!SSD1315_WriteCommand(pgm_read_byte(&ssd1315InitParams[i]))) {
+      FLAG_SET(*_i2creg, _I2C_BERF_);
+      I2C_Stop();
+      return 0;
+    }
+  }
   I2C_Stop();
+  return 1;
+}
+
+
+/**
+ * @brief  Writes/Sends a command to SSD1315 display
+ * @param  cmd: ssd1315 command
+ * @retval (uint8_t) status of operation
+ */
+static uint8_t SSD1315_WriteCommand(uint8_t cmd) {
+  /* --- Send control byte --- */
+  uint8_t ctrl = 0;
+  ctrl &= ~(_BV(_SSD1315_Co_)|_BV(_SSD1315_DC_));
+  I2C_SendByte(ctrl);
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
+    return 0;
+  }
+  /* --- Send data byte --- */
+  I2C_SendByte(cmd);
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
+    return 0;
+  }
+  return 1;
 }
 
 
