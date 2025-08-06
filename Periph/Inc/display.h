@@ -13,8 +13,8 @@
 
 #include "main.h"
 
-// #define DSPL_DSS1615
-#define DSPL_WH1602
+#define DSPL_SSD1315
+// #define DSPL_WH1602
    
 /* Exported functions prototypes */
 void Init_Display(void);
@@ -45,6 +45,9 @@ void WH1602_Write(uint8_t, uint8_t, const char*);
 #define _WR2NCHAR(ch)       ((ch & _1602A_4BMASK_)|_BV(_1602A_Bl)|_BV(_1602A_Rs))
 #define _WR1NCMD(cmd)       ((cmd & _1602A_4BMASK_)|_BV(_1602A_E)|_BV(_1602A_Bl))
 #define _WR2NCMD(cmd)       ((cmd & _1602A_4BMASK_)|_BV(_1602A_Bl))
+
+/* --- SSD1315 commands --- */
+#define _SSD1315_ADDR_      0x3c // SSD1315 I2C Address
 
 /* --- Display end of line parameters --- */
 #define _0DCF_              0

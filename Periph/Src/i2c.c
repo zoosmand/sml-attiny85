@@ -66,8 +66,8 @@ static void I2C_TransferBuffer(void) {
     USICR = tmp;
   }
   _delay_us(6);
-  USIDR = 0xff;
-  SDA_H;
+  // USIDR = 0xff;
+  // SDA_H;
 }
 
 

@@ -27,6 +27,10 @@ static uint16_t Calc_BufferLength(const char*);
   // static void WH1602_I2C_Read(uint16_t, uint8_t*);
 #endif
 
+#if defined(DSPL_SSD1315)
+  static void SSD1315_I2C_Init(void);
+#endif
+
 
 /* Private costants */
 #if defined(DSPL_WH1602)
@@ -54,7 +58,24 @@ static uint16_t Calc_BufferLength(const char*);
 #endif 
 
 
-
+#if defined(DSPL_SSD1315)
+  const uint8_t ssd1315InitParams[24] PROGMEM = {
+	  0xae,       // turn off oled panel
+	  0xd5, 0x80, // set display clock divide ratio/oscillator frequency
+	  0xa8, 0xfc, // set multiples ratio(1to64)
+	  0xd3, 0x00, // set display offset, no offset
+	  0x40,       // set start line address
+	  0x8d, 0x14, // set charge pump enable/disable, disable
+	  0xa1, 0xc8, // set segment re-map 127 to 0   a0:0 to seg127
+	  0xda, 0x12, // set com pins hardware configuration
+	  0x81, 0xcf, // set contrast control register
+	  0xd9, 0xf1, // set pre-charge period
+	  0xdb, 0x40, // set vcomh
+	  0xa4, 0xa6,
+	  0xaf,       // turn on oled panel
+	  0x00        // set low column address
+  };
+#endif
 
 
 /**
@@ -125,15 +146,39 @@ void Init_Display(void) {
 #if defined(DSPL_WH1602)
   WH1602_I2C_Init();
 #endif
+#if defined(DSPL_SSD1315)
+  SSD1315_I2C_Init();
+#endif
 }
 
 
 
 
+/* --- SSD1315 block --- */
+#if defined(DSPL_SSD1315)
+
+/**
+ * @brief  Initializes WH1602A display
+ * @retval None
+ */
+void SSD1315_I2C_Init(void) {
+ 
+  /* Initial delay according ssd1315 documentation */
+  _delay_us(50000);
+  I2C_WRITE;
+  I2C_Start();
+  _delay_us(48);
+  I2C_SendAddress(_SSD1315_ADDR_);
+  I2C_Stop();
+}
+
+
+#endif
 
 
 
-/* --- WH1602A block ---*/
+
+/* --- WH1602A block --- */
 #if defined(DSPL_WH1602)
 
 /**
