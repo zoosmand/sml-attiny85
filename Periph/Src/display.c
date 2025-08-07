@@ -61,7 +61,7 @@ static uint16_t Calc_BufferLength(const char*);
 
 
 #if defined(DSPL_SSD1315)
-  const uint8_t ssd1315InitParams[23] PROGMEM = {
+  const uint8_t ssd1315InitParams[24] PROGMEM = {
 	  0xae,       // turn off oled panel
 	  0xd5, 0x80, // set display clock divide ratio/oscillator frequency
 	  0xa8, 0xfc, // set multiples ratio(1to64)
@@ -74,8 +74,8 @@ static uint16_t Calc_BufferLength(const char*);
 	  0xd9, 0xf1, // set pre-charge period
 	  0xdb, 0x40, // set vcomh
 	  0xa4, 0xa6,
-	  0xaf       // turn on oled panel
-	  // 0x00        // set low column address
+	  0xaf,       // turn on oled panel
+	  0x00        // set low column address
   };
 #endif
 
@@ -149,18 +149,23 @@ void Init_Display(void) {
   WH1602_I2C_Init();
 #endif
 #if defined(DSPL_SSD1315)
-  SSD1315_I2C_Init();
+  if (SSD1315_I2C_Init()) {
 
-  char buf[6]= {
-    0b00111110,
-    0b01000001,
-    0b01000001,
-    0b01000001,
-    0b00100010,
-    0b00000000
-  };
+    uint8_t cmd[6]= {
+      0x21, 0x00, 0x05, 0x22, 0x00, 0x00
+    };
 
-  SSD1315_Write(buf);
+    uint8_t buf[6]= {
+      0b00111110,
+      0b01000001,
+      0b01000001,
+      0b01000001,
+      0b00100010,
+      0b00000000
+    };
+
+    SSD1315_Write(cmd, buf);
+  }
 #endif
 }
 
@@ -251,7 +256,7 @@ static uint8_t SSD1315_WriteData(uint8_t data) {
  * @param  buf: pointer to the character/text buffer
  * @retval (uint8_t) status of operation
  */
-uint8_t SSD1315_Write(char* buf) {
+uint8_t SSD1315_Write(uint8_t* cmd, uint8_t* buf) {
   I2C_WRITE;
   I2C_Start();
   _delay_us(48);
@@ -262,6 +267,16 @@ uint8_t SSD1315_Write(char* buf) {
     I2C_Stop();
     return 0;
   }
+  /* --- Send commands --- */
+  
+  for (uint8_t i = 0; i < 6; i++) {
+    if (!SSD1315_WriteCommand(*(cmd++))) {
+      FLAG_SET(*_i2creg, _I2C_BERF_);
+      I2C_Stop();
+      return 0;
+    }
+  }
+
   /* --- Send buffer data --- */
   // uint16_t len = Calc_BufferLength(buf);
   for (uint8_t i = 0; i < 6; i++) {

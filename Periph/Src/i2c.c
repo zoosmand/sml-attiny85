@@ -37,14 +37,14 @@ void I2C_Start(void) {
  * @retval  none
  */
 void I2C_Stop(void) {
-  // USIDR = 0x80;
+  USIDR = 0x80;
   SDA_L;
   SCL_H;
   while (!(I2CPIN & _BV(I2CSCL)));
   _delay_us(4);
   SDA_H;
   _delay_us(4);
-  USISR |= _BV(USIPF);
+  USISR |= _BV(USIPF)|_BV(USISIF);
   // USISR |= _BV(USISIF);
 }
 
