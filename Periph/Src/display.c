@@ -152,7 +152,12 @@ uint8_t Init_Display(void) {
   return 1;
 #endif
 #if defined(DSPL_SSD1315)
-  return SSD1315_I2C_Init();
+  if (!SSD1315_I2C_Init()) {
+    FLAG_SET(*_i2creg, _I2C_BERF_);
+    I2C_Stop();
+    return 0;
+  }
+  return 1;
 #endif
 }
 
@@ -169,7 +174,7 @@ uint8_t Init_Display(void) {
 static uint8_t SSD1315_I2C_Init(void) {
  
   /* Initial delay according ssd1315 documentation */
-  _delay_us(50000);
+  _delay_us(15000);
   I2C_WRITE;
   // I2C_Start();
   // _delay_us(48);
@@ -182,63 +187,45 @@ static uint8_t SSD1315_I2C_Init(void) {
   // }
   /* --- Initialization commands --- */
   for (uint8_t i = 0; i < sizeof(ssd1315InitParams); i++) {
-    if (!SSD1315_WriteCommand(pgm_read_byte(&ssd1315InitParams[i]))) {
-      FLAG_SET(*_i2creg, _I2C_BERF_);
-      I2C_Stop();
-      return 0;
-    }
+    if (!SSD1315_WriteCommand(pgm_read_byte(&ssd1315InitParams[i]))) return 0;
   }
   // I2C_Stop();
   // _delay_us(50);
   
+
+  
   /* --- Clear display --- */
   uint8_t dataClrDspl[8] = {0x20, 0x00, 0x21, 0x00, 0x7f, 0x22, 0x00, 0x07};
   for (uint8_t i = 0; i < sizeof(dataClrDspl); i++) {
-    if (!SSD1315_WriteCommand(dataClrDspl[i])) {
-      FLAG_SET(*_i2creg, _I2C_BERF_);
-      I2C_Stop();
-      return 0;
-    }
+    if (!SSD1315_WriteCommand(dataClrDspl[i])) return 0;
   }
 
   I2C_Start();
   _delay_us(48);
   I2C_SendAddress(_SSD1315_ADDR_);
   /* --- Control ACK on sending address --- */
-  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
-    FLAG_SET(*_i2creg, _I2C_BERF_);
-    I2C_Stop();
-    return 0;
-  }
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) return 0;
   /* --- Send control byte --- */
-  uint8_t ctrl = 0;
-  ctrl &= ~_BV(_SSD1315_Co_);
-  ctrl |= _BV(_SSD1315_DC_);
-  if (!SSD1315_WriteData(ctrl)) return 0;
+  if (!SSD1315_WriteData(_BV(_SSD1315_DC_)&~_BV(_SSD1315_Co_))) return 0;
 
   for (uint8_t i = 0; i < 8; i++) {
     for (uint8_t y = 0; y < 128; y++) {
       if (!SSD1315_WriteData(0x00)) return 0;
     }
   }
-
   I2C_Stop();  
-  _delay_us(1);
+  // _delay_us(1);
 
 
 
   /* --- Set cursor position --- */
   uint8_t dataCurPos[6]= {
-    0x21, 0x00, 0x05, 0x22, 0x02, 0x02 
+    0x21, 0x06, 0x0b, 0x22, 0x06, 0x06 
   };
   for (uint8_t i = 0; i < sizeof(dataCurPos); i++) {
-    if (!SSD1315_WriteCommand(dataCurPos[i])) {
-      FLAG_SET(*_i2creg, _I2C_BERF_);
-      I2C_Stop();
-      return 0;
-    }
+    if (!SSD1315_WriteCommand(dataCurPos[i])) return 0;
   }
-  _delay_us(50);
+  // _delay_us(50);
 
   /* --- Write a symbol --- */
   uint8_t buf[6]= {0b00111110,0b01000001,0b01000001,0b01000001,0b00100010,0b00000000};
@@ -263,8 +250,8 @@ static uint8_t SSD1315_WriteCommand(uint8_t cmd) {
   I2C_SendAddress(_SSD1315_ADDR_);
   /* --- Control ACK on sending address --- */
   if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
-    FLAG_SET(*_i2creg, _I2C_BERF_);
-    I2C_Stop();
+    // FLAG_SET(*_i2creg, _I2C_BERF_);
+    // I2C_Stop();
     return 0;
   }
   
