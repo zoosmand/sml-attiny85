@@ -30,7 +30,7 @@ static uint16_t Calc_BufferLength(const char*);
 #if defined(DSPL_SSD1315)
   static uint8_t SSD1315_I2C_Init(void);
   static uint8_t SSD1315_WriteCommand(uint8_t);
-  static uint8_t SSD1315_WriteData(uint8_t);
+  static uint8_t SSD1315_WriteDataByte(uint8_t);
 #endif
 
 
@@ -79,6 +79,13 @@ static uint16_t Calc_BufferLength(const char*);
     0xa6,       // set normal/inverse display; [0]=1 then inverse; [0]=0 then normal
 	  0xaf        // set display on
   };
+
+  const uint8_t ssd1315ClrDspl[8] PROGMEM = {
+    0x20, 0x00,       // set horizontal addressing mode 
+    0x21, 0x00, 0x7f, // set column address from 0 to 127
+    0x22, 0x00, 0x07  // set page address from 0 to 7
+  };
+
 #endif
 
 
@@ -176,63 +183,36 @@ static uint8_t SSD1315_I2C_Init(void) {
   /* Initial delay according ssd1315 documentation */
   _delay_us(15000);
   I2C_WRITE;
-  // I2C_Start();
-  // _delay_us(48);
-  // I2C_SendAddress(_SSD1315_ADDR_);
-  // /* --- Control ACK on sending address --- */
-  // if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
-  //   FLAG_SET(*_i2creg, _I2C_BERF_);
-  //   I2C_Stop();
-  //   return 0;
-  // }
+
   /* --- Initialization commands --- */
   for (uint8_t i = 0; i < sizeof(ssd1315InitParams); i++) {
     if (!SSD1315_WriteCommand(pgm_read_byte(&ssd1315InitParams[i]))) return 0;
   }
-  // I2C_Stop();
-  // _delay_us(50);
-  
 
-  
-  /* --- Clear display --- */
-  uint8_t dataClrDspl[8] = {0x20, 0x00, 0x21, 0x00, 0x7f, 0x22, 0x00, 0x07};
-  for (uint8_t i = 0; i < sizeof(dataClrDspl); i++) {
-    if (!SSD1315_WriteCommand(dataClrDspl[i])) return 0;
+    /* --- Clear display --- */
+  for (uint8_t i = 0; i < sizeof(ssd1315ClrDspl); i++) {
+    if (!SSD1315_WriteCommand(pgm_read_byte(&ssd1315ClrDspl[i]))) return 0;
   }
 
   I2C_Start();
   _delay_us(48);
-  I2C_SendAddress(_SSD1315_ADDR_);
   /* --- Control ACK on sending address --- */
+  I2C_SendAddress(_SSD1315_ADDR_);
   if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) return 0;
   /* --- Send control byte --- */
-  if (!SSD1315_WriteData(_BV(_SSD1315_DC_)&~_BV(_SSD1315_Co_))) return 0;
+  if (!SSD1315_WriteDataByte((uint8_t)(_BV(_SSD1315_DC_)&~_BV(_SSD1315_Co_)))) return 0;
 
   for (uint8_t i = 0; i < 8; i++) {
     for (uint8_t y = 0; y < 128; y++) {
-      if (!SSD1315_WriteData(0x00)) return 0;
+      if (!SSD1315_WriteDataByte(0x00)) return 0;
     }
   }
   I2C_Stop();  
-  // _delay_us(1);
 
-
-
-  /* --- Set cursor position --- */
-  uint8_t dataCurPos[6]= {
-    0x21, 0x06, 0x0b, 0x22, 0x06, 0x06 
-  };
-  for (uint8_t i = 0; i < sizeof(dataCurPos); i++) {
-    if (!SSD1315_WriteCommand(dataCurPos[i])) return 0;
-  }
-  // _delay_us(50);
 
   /* --- Write a symbol --- */
   uint8_t buf[6]= {0b00111110,0b01000001,0b01000001,0b01000001,0b00100010,0b00000000};
-  SSD1315_Write(buf);
-
-
-
+  SSD1315_WriteBuf(buf, 6, 0x20, 0x26, 0x04, 0x04);
 
 
   return 1;
@@ -247,26 +227,19 @@ static uint8_t SSD1315_I2C_Init(void) {
 static uint8_t SSD1315_WriteCommand(uint8_t cmd) {
   I2C_Start();
   _delay_us(48);
-  I2C_SendAddress(_SSD1315_ADDR_);
+
   /* --- Control ACK on sending address --- */
-  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
-    // FLAG_SET(*_i2creg, _I2C_BERF_);
-    // I2C_Stop();
-    return 0;
-  }
+  I2C_SendAddress(_SSD1315_ADDR_);
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) return 0;
   
   /* --- Send control byte --- */
-  uint8_t ctrl = 0;
-  ctrl &= ~(_BV(_SSD1315_Co_)|_BV(_SSD1315_DC_));
-  I2C_SendByte(ctrl);
-  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
-    return 0;
-  }
+  I2C_SendByte((uint8_t)(~_BV(_SSD1315_Co_)&~_BV(_SSD1315_DC_)));
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) return 0;
+  
   /* --- Send data byte --- */
   I2C_SendByte(cmd);
-  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
-    return 0;
-  }
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) return 0;
+
   I2C_Stop();
   return 1;
 }
@@ -277,12 +250,11 @@ static uint8_t SSD1315_WriteCommand(uint8_t cmd) {
  * @param  data: ssd1315 data byte
  * @retval (uint8_t) status of operation
  */
-static uint8_t SSD1315_WriteData(uint8_t data) {
+static uint8_t SSD1315_WriteDataByte(uint8_t data) {
   /* --- Send data byte --- */
   I2C_SendByte(data);
-  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
-    return 0;
-  }
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) return 0;
+  
   return 1;
 }
 
@@ -290,34 +262,38 @@ static uint8_t SSD1315_WriteData(uint8_t data) {
 /**
  * @brief  Writes/Sends a text buffer to SSD1315 display
  * @param  buf: pointer to the character/text buffer
+ * @param  len: buffer length
+ * @param  ha_s: horizontal address start position
+ * @param  ha_e: horizontal address end position
+ * @param  p_s: page address start position
+ * @param  p_e: page address end position
  * @retval (uint8_t) status of operation
  */
-uint8_t SSD1315_Write(uint8_t* buf) {
+uint8_t SSD1315_WriteBuf(uint8_t* buf, uint16_t len, uint8_t ha_s, uint8_t ha_e, uint8_t p_s, uint8_t p_e) {
   I2C_WRITE;
+
+  /* --- Set cursor position --- */
+  if (!SSD1315_WriteCommand(0x21)) return 0;
+  if (!SSD1315_WriteCommand(ha_s)) return 0;
+  if (!SSD1315_WriteCommand(ha_e)) return 0;
+  if (!SSD1315_WriteCommand(0x22)) return 0;
+  if (!SSD1315_WriteCommand(p_s)) return 0;
+  if (!SSD1315_WriteCommand(p_e)) return 0;
+
+  /* --- Write the buffer --- */
   I2C_Start();
   _delay_us(48);
-  I2C_SendAddress(_SSD1315_ADDR_);
+
   /* --- Control ACK on sending address --- */
-  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) {
-    FLAG_SET(*_i2creg, _I2C_BERF_);
-    I2C_Stop();
-    return 0;
-  }
+  I2C_SendAddress(_SSD1315_ADDR_);
+  if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) return 0;
 
   /* --- Send control byte --- */
-  uint8_t ctrl = 0;
-  ctrl &= ~_BV(_SSD1315_Co_);
-  ctrl |= _BV(_SSD1315_DC_);
-  if (!SSD1315_WriteData(ctrl)) return 0;
+  if (!SSD1315_WriteDataByte((uint8_t)(_BV(_SSD1315_DC_)&~_BV(_SSD1315_Co_)))) return 0;
 
   /* --- Send buffer data --- */
-  // uint16_t len = Calc_BufferLength(buf);
-  for (uint8_t i = 0; i < 6; i++) {
-    if (!SSD1315_WriteData(*(buf++))) {
-      FLAG_SET(*_i2creg, _I2C_BERF_);
-      I2C_Stop();
-      return 0;
-    }
+  for (uint8_t i = 0; i < len; i++) {
+    if (!SSD1315_WriteDataByte(*(buf++))) return 0;
   }
   I2C_Stop();
   return 1;
