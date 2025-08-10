@@ -227,7 +227,7 @@ static uint8_t SSD1315_I2C_Init(void) {
   }
 
   I2C_Start();
-  _delay_us(48);
+  _delay_us(1);
   /* --- Control ACK on sending address --- */
   I2C_SendAddress(_SSD1315_ADDR_);
   if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) return 0;
@@ -251,7 +251,7 @@ static uint8_t SSD1315_I2C_Init(void) {
  */
 static uint8_t SSD1315_WriteCommand(uint8_t cmd) {
   I2C_Start();
-  _delay_us(48);
+  _delay_us(1);
 
   /* --- Control ACK on sending address --- */
   I2C_SendAddress(_SSD1315_ADDR_);
@@ -311,7 +311,7 @@ uint8_t SSD1315_WriteBuf(const uint8_t* buf, uint16_t len, uint8_t* pos) {
 
   /* --- Write the buffer --- */
   I2C_Start();
-  _delay_us(48);
+  _delay_us(1);
 
   /* --- Control ACK on sending address --- */
   I2C_SendAddress(_SSD1315_ADDR_);
