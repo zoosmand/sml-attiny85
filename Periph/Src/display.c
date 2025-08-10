@@ -61,7 +61,7 @@ static uint16_t Calc_BufferLength(const char*);
 
 
 #if defined(DSPL_SSD1315)
-  const uint8_t ssd1315InitParams[24] PROGMEM = {
+  const static uint8_t ssd1315InitParams[24] PROGMEM = {
 	  0xae,       // set display off
 	  0xd5, 0x80, // set display clock divide; oscillator frequency in [7:4]; ratio in [3:0]
 	  0xa8, 0x3c, // set MUX ratio; ratio in [5:0]
@@ -69,8 +69,8 @@ static uint16_t Calc_BufferLength(const char*);
 	  0x40,       // set start line address; address in [5:0]
 	  0x00,       // set low column address; address in [3:0]
 	  0x8d, 0x14, // enable charge pump; enable in [2]; [7]=0 and [0]=0 set 7.5V charge pumpmode
-	  0xa1,       // set segment re-map; remap in [0]; [0]=1 then 127->0; [0]=0 then 0->127
-    0xc8,       // set COM csan direction; direction in [3]; [3]=0 then COM[0]->COM[-1]; [3]=1 then COM[n-1]->COM[0]
+	  0xa1,       // set segment re-map; remap in [0]; [0]=1 then 127->0; [0]=0 then 0->127 
+    0xc0,       // set COM csan direction; direction in [3]; [3]=0 then COM[0]->COM[-1]; [3]=1 then COM[n-1]->COM[0]
 	  0xda, 0x12, // set com pins hardware configuration; configuratino in [5:4]
 	  0x81, 0x7f, // set contrast control register
 	  0xd9, 0x88, // set pre-charge period; phase 1 in [7:4]; phase 2 in [3:0] 
@@ -80,11 +80,25 @@ static uint16_t Calc_BufferLength(const char*);
 	  0xaf        // set display on
   };
 
-  const uint8_t ssd1315ClrDspl[8] PROGMEM = {
+  const static uint8_t ssd1315ClrDspl[8] PROGMEM = {
     0x20, 0x00,       // set horizontal addressing mode 
     0x21, 0x00, 0x7f, // set column address from 0 to 127
     0x22, 0x00, 0x07  // set page address from 0 to 7
   };
+
+  const static uint8_t ssd1315InitCurPosParams[8] PROGMEM = {
+    0x20, 0x01, 
+    0x21, 0x00, 0x0b, 
+    0x22, 0x05, 0x06
+  };
+
+  // const static uint8_t ssd1315InitCurPosParams[8] PROGMEM = {
+  //   0x20, 0x00, 
+  //   0x21, 0x00, 0x05, 
+  //   0x22, 0x06, 0x06
+  // };
+
+  static uint8_t ssd1315CurrentCurPosParams[8];
 
 #endif
 
@@ -137,7 +151,22 @@ int putc_dspl(char ch, FILE *stream){
     I2C_Stop();
     diplPrintPos++;
   }
-#endif
+#endif /* DSPL_WH1602 */
+
+#if defined(DSPL_SSD1315)
+
+  if ((FLAG_CHECK(_DSPLREG_, _0DCF_)) || (FLAG_CHECK(_DSPLREG_, _0ACF_))) {
+    FLAG_CLR(_DSPLREG_, _0DCF_);
+    FLAG_CLR(_DSPLREG_, _0ACF_);
+    for (uint8_t i = 0; i < sizeof(ssd1315InitCurPosParams); i++) {
+      ssd1315CurrentCurPosParams[i] = pgm_read_byte(&ssd1315InitCurPosParams[i]);
+    }
+  }
+  if ((ch != 0x0a) && (ch != 0x0d)) {
+    SSD1315_WriteBuf(font_dot_10x14[(((uint8_t)ch) - 32)], sizeof(font_dot_10x14_t), ssd1315CurrentCurPosParams);
+  }
+
+#endif /* DSPL_SSD1315 */
 
   if (ch == 0x0a) FLAG_SET(_DSPLREG_, _0DCF_);
   if (ch == 0x0d) FLAG_SET(_DSPLREG_, _0ACF_);
@@ -163,6 +192,9 @@ uint8_t Init_Display(void) {
     FLAG_SET(*_i2creg, _I2C_BERF_);
     I2C_Stop();
     return 0;
+  }
+  for (uint8_t i = 0; i < sizeof(ssd1315InitCurPosParams); i++) {
+    ssd1315CurrentCurPosParams[i] = pgm_read_byte(&ssd1315InitCurPosParams[i]);
   }
   return 1;
 #endif
@@ -195,7 +227,7 @@ static uint8_t SSD1315_I2C_Init(void) {
   }
 
   I2C_Start();
-  _delay_us(48);
+  _delay_us(1);
   /* --- Control ACK on sending address --- */
   I2C_SendAddress(_SSD1315_ADDR_);
   if (!FLAG_CHECK(*_i2creg, _I2C_ACKF_)) return 0;
@@ -208,13 +240,6 @@ static uint8_t SSD1315_I2C_Init(void) {
     }
   }
   I2C_Stop();  
-
-
-  /* --- Write a symbol --- */
-  // uint8_t buf[6]= {0b00111110,0b01000001,0b01000001,0b01000001,0b00100010,0b00000000};
-  SSD1315_WriteBuf(font_dot_5x7[25], 6, 0x20, 0x26, 0x04, 0x04);
-
-
   return 1;
 }
 
@@ -226,7 +251,7 @@ static uint8_t SSD1315_I2C_Init(void) {
  */
 static uint8_t SSD1315_WriteCommand(uint8_t cmd) {
   I2C_Start();
-  _delay_us(48);
+  _delay_us(1);
 
   /* --- Control ACK on sending address --- */
   I2C_SendAddress(_SSD1315_ADDR_);
@@ -263,26 +288,30 @@ static uint8_t SSD1315_WriteDataByte(uint8_t data) {
  * @brief  Writes/Sends a text buffer to SSD1315 display
  * @param  buf: pointer to the character/text buffer
  * @param  len: buffer length
- * @param  ha_s: horizontal address start position
- * @param  ha_e: horizontal address end position
- * @param  p_s: page address start position
- * @param  p_e: page address end position
+ * @param  pos: pointer to the cursor position
  * @retval (uint8_t) status of operation
  */
-uint8_t SSD1315_WriteBuf(const uint8_t* buf, uint16_t len, uint8_t ha_s, uint8_t ha_e, uint8_t p_s, uint8_t p_e) {
+uint8_t SSD1315_WriteBuf(const uint8_t* buf, uint16_t len, uint8_t* pos) {
   I2C_WRITE;
 
   /* --- Set cursor position --- */
-  if (!SSD1315_WriteCommand(0x21)) return 0;
-  if (!SSD1315_WriteCommand(ha_s)) return 0;
-  if (!SSD1315_WriteCommand(ha_e)) return 0;
-  if (!SSD1315_WriteCommand(0x22)) return 0;
-  if (!SSD1315_WriteCommand(p_s)) return 0;
-  if (!SSD1315_WriteCommand(p_e)) return 0;
+  for (uint8_t i = 0; i < 8; i++) {
+    if (!SSD1315_WriteCommand(pos[i])) return 0;
+  }
+  
+  if (((pos[4] + 12) & 0x7f) < pos[3]) {
+    pos[3] = 0x00;
+    pos[4] = 0x0b;
+    pos[6] = (pos[6] - 2) & 0x07;
+    pos[7] = (pos[7] - 2) & 0x07;
+  } else {
+    pos[3] = pos[4] + 1;
+    pos[4] = pos[4] + 12;
+  }
 
   /* --- Write the buffer --- */
   I2C_Start();
-  _delay_us(48);
+  _delay_us(1);
 
   /* --- Control ACK on sending address --- */
   I2C_SendAddress(_SSD1315_ADDR_);

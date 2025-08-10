@@ -23,9 +23,9 @@ static void I2C_TransferBuffer(void);
  */
 void I2C_Start(void) {
   SCL_H;
-  _delay_us(4);
+  _delay_us(1);
   SDA_L;
-  _delay_us(4);
+  _delay_us(1);
   SCL_L;
   SDA_H;
   USISR |= _BV(USISIF);
@@ -41,9 +41,9 @@ void I2C_Stop(void) {
   SDA_L;
   SCL_H;
   while (!(I2CPIN & _BV(I2CSCL)));
-  _delay_us(4);
+  _delay_us(1);
   SDA_H;
-  _delay_us(4);
+  _delay_us(1);
   USISR |= _BV(USIPF)|_BV(USISIF);
   // USISR |= _BV(USISIF);
 }
@@ -59,13 +59,13 @@ static void I2C_TransferBuffer(void) {
   tmp = USICR;
   tmp |= _BV(USITC);
   while (!(USISR & _BV(USIOIF))) {
-    _delay_us(4);
+    _delay_us(1);
     USICR = tmp;
     while (!(I2CPIN & _BV(I2CSCL)));
-    _delay_us(4);
+    _delay_us(1);
     USICR = tmp;
   }
-  _delay_us(6);
+  _delay_us(1);
   // USIDR = 0xff;
   // SDA_H;
 }

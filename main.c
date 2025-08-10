@@ -74,7 +74,7 @@ static void Second_Handler(void) {
     LedToggle_Handler();
 
     stdout = &dsplout;
-    printf("%d\n", secCnt);
+    printf("sec:%d\n", secCnt);
   }
 }
 
