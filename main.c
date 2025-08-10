@@ -74,7 +74,7 @@ static void Second_Handler(void) {
     LedToggle_Handler();
 
     stdout = &dsplout;
-    printf("Incredebly long text for the TESTING cursor position on the tiny SSD1315 display, sec:%d\n", secCnt);
+    printf("sec:%d\n", secCnt);
   }
 }
 
