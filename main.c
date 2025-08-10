@@ -5,7 +5,7 @@
  * Project: Simple Multitasking Logic
  * Platform: MicroChip ATTiny85
  * Created: 02.08.2025 9:53:17 AM
- * Author : Dmitry Slobodchikov
+ * Author: Dmitry Slobodchikov
  */ 
 
 #include "main.h"
@@ -16,7 +16,9 @@ static volatile uint16_t  secCnt  = 0;
 
 static void Cron_Handler(void);
 static void Second_Handler(void);
-static void LedToggle_Handler(void);
+
+static FILE dsplout = FDEV_SETUP_STREAM(putc_dspl, NULL, _FDEV_SETUP_WRITE);
+
 
 
 /**
@@ -26,10 +28,13 @@ static void LedToggle_Handler(void);
 int main(void) {
   /* Initialization block */
   cli();
+  _INIT_MCU;
   _INIT_WDG;
   _INIT_LED;
   _INIT_TIMERS;
+  _INIT_I2C;
   Init_ISR();
+  Init_Display();
   sei();
 
   while (1) {
@@ -48,9 +53,9 @@ static void Cron_Handler(void) {
   cli();
   if (FLAG_CHECK(_GREG_, _SYSTF_)) {
     FLAG_CLR(_GREG_, _SYSTF_);
+    sysCnt &= SEC_TICK_MASK;
 
-    if (sysCnt >= 1000) {
-      sysCnt = 0;
+    if (!sysCnt) {
       secCnt++;
       FLAG_SET(_GREG_, _SECTF_);
     }
@@ -67,22 +72,11 @@ static void Second_Handler(void) {
   if (FLAG_CHECK(_GREG_, _SECTF_)) {
     FLAG_CLR(_GREG_, _SECTF_);
     LedToggle_Handler();
+
+    stdout = &dsplout;
+    printf("sec:%d\n", secCnt);
   }
 }
-
-
-/**
- * @brief   The toggling LED handler.
- * @retval  none
- */
-static void LedToggle_Handler(void) {
-  if (LEDPIN & (1 << LED0PIN)) {
-    LEDPORT &= ~(1 << LED0PIN);
-  } else {
-    LEDPORT |= (1 << LED0PIN);
-  }
-}
-
 
 
 /* Getters */
