@@ -211,8 +211,8 @@ static uint8_t SSD1315_I2C_Init(void) {
 
 
   /* --- Write a symbol --- */
-  uint8_t buf[6]= {0b00111110,0b01000001,0b01000001,0b01000001,0b00100010,0b00000000};
-  SSD1315_WriteBuf(buf, 6, 0x20, 0x26, 0x04, 0x04);
+  // uint8_t buf[6]= {0b00111110,0b01000001,0b01000001,0b01000001,0b00100010,0b00000000};
+  SSD1315_WriteBuf(font_dot_5x7[25], 6, 0x20, 0x26, 0x04, 0x04);
 
 
   return 1;
@@ -269,7 +269,7 @@ static uint8_t SSD1315_WriteDataByte(uint8_t data) {
  * @param  p_e: page address end position
  * @retval (uint8_t) status of operation
  */
-uint8_t SSD1315_WriteBuf(uint8_t* buf, uint16_t len, uint8_t ha_s, uint8_t ha_e, uint8_t p_s, uint8_t p_e) {
+uint8_t SSD1315_WriteBuf(const uint8_t* buf, uint16_t len, uint8_t ha_s, uint8_t ha_e, uint8_t p_s, uint8_t p_e) {
   I2C_WRITE;
 
   /* --- Set cursor position --- */
@@ -293,7 +293,7 @@ uint8_t SSD1315_WriteBuf(uint8_t* buf, uint16_t len, uint8_t ha_s, uint8_t ha_e,
 
   /* --- Send buffer data --- */
   for (uint8_t i = 0; i < len; i++) {
-    if (!SSD1315_WriteDataByte(*(buf++))) return 0;
+    if (!SSD1315_WriteDataByte(pgm_read_byte(&buf[i]))) return 0;
   }
   I2C_Stop();
   return 1;

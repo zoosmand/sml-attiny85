@@ -12,6 +12,7 @@
 #define _DISPLAY_H
 
 #include "main.h"
+#include "fonts.h"
 
 #define DSPL_SSD1315
 // #define DSPL_WH1602
@@ -20,7 +21,7 @@
 uint8_t Init_Display(void);
 int putc_dspl(char, FILE*);
 void WH1602_Write(uint8_t, uint8_t, const char*);
-uint8_t SSD1315_WriteBuf(uint8_t*, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
+uint8_t SSD1315_WriteBuf(const uint8_t*, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
 
 
 /* --- WH0802A commands --- */
