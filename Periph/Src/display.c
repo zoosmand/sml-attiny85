@@ -70,7 +70,7 @@ static uint16_t Calc_BufferLength(const char*);
 	  0x00,       // set low column address; address in [3:0]
 	  0x8d, 0x14, // enable charge pump; enable in [2]; [7]=0 and [0]=0 set 7.5V charge pumpmode
 	  0xa1,       // set segment re-map; remap in [0]; [0]=1 then 127->0; [0]=0 then 0->127
-    0xc8,       // set COM csan direction; direction in [3]; [3]=0 then COM[0]->COM[-1]; [3]=1 then COM[n-1]->COM[0]
+    0xc0,       // set COM csan direction; direction in [3]; [3]=0 then COM[0]->COM[-1]; [3]=1 then COM[n-1]->COM[0]
 	  0xda, 0x12, // set com pins hardware configuration; configuratino in [5:4]
 	  0x81, 0x7f, // set contrast control register
 	  0xd9, 0x88, // set pre-charge period; phase 1 in [7:4]; phase 2 in [3:0] 
@@ -211,8 +211,7 @@ static uint8_t SSD1315_I2C_Init(void) {
 
 
   /* --- Write a symbol --- */
-  // uint8_t buf[6]= {0b00111110,0b01000001,0b01000001,0b01000001,0b00100010,0b00000000};
-  SSD1315_WriteBuf(font_dot_5x7[25], 6, 0x20, 0x26, 0x04, 0x04);
+  SSD1315_WriteBuf(font_dot_5x7[33], 6, 0x20, 0x26, 0x06, 0x06);
 
 
   return 1;
