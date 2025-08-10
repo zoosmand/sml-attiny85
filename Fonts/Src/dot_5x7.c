@@ -11,8 +11,6 @@
 #include "fonts.h"
 
 
-
-//////////////////////////////////////////////////////////////////////////
 const font_dot_5x7_t font_dot_5x7[96] PROGMEM = {
   {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, // [space]  #32 (0x20)
   {0x00, 0x00, 0x00, 0xfa, 0x00, 0x00}, // !        #33 (0x21)
@@ -111,8 +109,3 @@ const font_dot_5x7_t font_dot_5x7[96] PROGMEM = {
   {0x00, 0x10, 0x20, 0x10, 0x20, 0x00}, // ~        #126 (0x7e)
   {0x00, 0x00, 0x00, 0x00, 0x40, 0x00}  // �        #176 (0xb0)
 };
-
-
-uint16_t Get_FontArrayLength(void) {
-  return sizeof(font_dot_5x7);
-}

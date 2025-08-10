@@ -14,11 +14,10 @@
 #include "main.h"
 
 typedef uint8_t font_dot_5x7_t[6];
+typedef uint8_t font_dot_10x14_t[24];
 
 const font_dot_5x7_t font_dot_5x7[96];
-
-
-uint16_t Get_FontArrayLength(void);
+const font_dot_10x14_t font_dot_10x14[96];
 
 
 #endif /* FONTS_H_ */

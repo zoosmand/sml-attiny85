@@ -69,7 +69,7 @@ static uint16_t Calc_BufferLength(const char*);
 	  0x40,       // set start line address; address in [5:0]
 	  0x00,       // set low column address; address in [3:0]
 	  0x8d, 0x14, // enable charge pump; enable in [2]; [7]=0 and [0]=0 set 7.5V charge pumpmode
-	  0xa1,       // set segment re-map; remap in [0]; [0]=1 then 127->0; [0]=0 then 0->127
+	  0xa1,       // set segment re-map; remap in [0]; [0]=1 then 127->0; [0]=0 then 0->127 
     0xc0,       // set COM csan direction; direction in [3]; [3]=0 then COM[0]->COM[-1]; [3]=1 then COM[n-1]->COM[0]
 	  0xda, 0x12, // set com pins hardware configuration; configuratino in [5:4]
 	  0x81, 0x7f, // set contrast control register
@@ -211,7 +211,15 @@ static uint8_t SSD1315_I2C_Init(void) {
 
 
   /* --- Write a symbol --- */
-  SSD1315_WriteBuf(font_dot_5x7[33], 6, 0x20, 0x26, 0x06, 0x06);
+  uint8_t bufParams[8] = {
+    0x20, 0x01, 
+    0x21, 0x30, 0x3c, 
+    0x22, 0x04, 0x05
+  };
+  SSD1315_WriteBuf(font_dot_10x14[33], 24, bufParams);
+  SSD1315_WriteBuf(font_dot_10x14[34], 24, bufParams);
+  SSD1315_WriteBuf(font_dot_10x14[35], 24, bufParams);
+  // SSD1315_WriteBuf(font_dot_5x7[33], 6, bufParams);
 
 
   return 1;
@@ -262,22 +270,18 @@ static uint8_t SSD1315_WriteDataByte(uint8_t data) {
  * @brief  Writes/Sends a text buffer to SSD1315 display
  * @param  buf: pointer to the character/text buffer
  * @param  len: buffer length
- * @param  ha_s: horizontal address start position
- * @param  ha_e: horizontal address end position
- * @param  p_s: page address start position
- * @param  p_e: page address end position
+ * @param  pos: pointer to the cursor position
  * @retval (uint8_t) status of operation
  */
-uint8_t SSD1315_WriteBuf(const uint8_t* buf, uint16_t len, uint8_t ha_s, uint8_t ha_e, uint8_t p_s, uint8_t p_e) {
+uint8_t SSD1315_WriteBuf(const uint8_t* buf, uint16_t len, uint8_t* pos) {
   I2C_WRITE;
 
   /* --- Set cursor position --- */
-  if (!SSD1315_WriteCommand(0x21)) return 0;
-  if (!SSD1315_WriteCommand(ha_s)) return 0;
-  if (!SSD1315_WriteCommand(ha_e)) return 0;
-  if (!SSD1315_WriteCommand(0x22)) return 0;
-  if (!SSD1315_WriteCommand(p_s)) return 0;
-  if (!SSD1315_WriteCommand(p_e)) return 0;
+  for (uint8_t i = 0; i < 8; i++) {
+    if (!SSD1315_WriteCommand(pos[i])) return 0;
+  }
+  pos[3] = pos[4]+1;
+  pos[4] = pos[4]+12;
 
   /* --- Write the buffer --- */
   I2C_Start();
