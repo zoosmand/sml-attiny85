@@ -61,7 +61,7 @@ static uint16_t Calc_BufferLength(const char*);
 
 
 #if defined(DSPL_SSD1315)
-  const uint8_t ssd1315InitParams[24] PROGMEM = {
+  const static uint8_t ssd1315InitParams[24] PROGMEM = {
 	  0xae,       // set display off
 	  0xd5, 0x80, // set display clock divide; oscillator frequency in [7:4]; ratio in [3:0]
 	  0xa8, 0x3c, // set MUX ratio; ratio in [5:0]
@@ -80,11 +80,19 @@ static uint16_t Calc_BufferLength(const char*);
 	  0xaf        // set display on
   };
 
-  const uint8_t ssd1315ClrDspl[8] PROGMEM = {
+  const static uint8_t ssd1315ClrDspl[8] PROGMEM = {
     0x20, 0x00,       // set horizontal addressing mode 
     0x21, 0x00, 0x7f, // set column address from 0 to 127
     0x22, 0x00, 0x07  // set page address from 0 to 7
   };
+
+  const static uint8_t ssd1315InitCurPosParams[8] PROGMEM = {
+    0x20, 0x01, 
+    0x21, 0x00, 0x0c, 
+    0x22, 0x04, 0x05
+  };
+
+  static uint8_t ssd1315CurrentCurPosParams[8];
 
 #endif
 
@@ -137,7 +145,25 @@ int putc_dspl(char ch, FILE *stream){
     I2C_Stop();
     diplPrintPos++;
   }
-#endif
+#endif /* DSPL_WH1602 */
+
+
+
+
+#if defined(DSPL_SSD1315)
+
+  if ((FLAG_CHECK(_DSPLREG_, _0DCF_)) || (FLAG_CHECK(_DSPLREG_, _0ACF_))) {
+    FLAG_CLR(_DSPLREG_, _0DCF_);
+    FLAG_CLR(_DSPLREG_, _0ACF_);
+    for (uint8_t i = 0; i < sizeof(ssd1315InitCurPosParams); i++) {
+      ssd1315CurrentCurPosParams[i] = pgm_read_byte(&ssd1315InitCurPosParams[i]);
+    }
+  }
+  if ((ch != 0x0a) && (ch != 0x0d)) {
+    SSD1315_WriteBuf(font_dot_10x14[(((uint8_t)ch) - 32)], 24, ssd1315CurrentCurPosParams);
+  }
+
+#endif /* DSPL_SSD1315 */
 
   if (ch == 0x0a) FLAG_SET(_DSPLREG_, _0DCF_);
   if (ch == 0x0d) FLAG_SET(_DSPLREG_, _0ACF_);
@@ -163,6 +189,9 @@ uint8_t Init_Display(void) {
     FLAG_SET(*_i2creg, _I2C_BERF_);
     I2C_Stop();
     return 0;
+  }
+  for (uint8_t i = 0; i < sizeof(ssd1315InitCurPosParams); i++) {
+    ssd1315CurrentCurPosParams[i] = pgm_read_byte(&ssd1315InitCurPosParams[i]);
   }
   return 1;
 #endif
@@ -208,20 +237,6 @@ static uint8_t SSD1315_I2C_Init(void) {
     }
   }
   I2C_Stop();  
-
-
-  /* --- Write a symbol --- */
-  uint8_t bufParams[8] = {
-    0x20, 0x01, 
-    0x21, 0x30, 0x3c, 
-    0x22, 0x04, 0x05
-  };
-  SSD1315_WriteBuf(font_dot_10x14[33], 24, bufParams);
-  SSD1315_WriteBuf(font_dot_10x14[34], 24, bufParams);
-  SSD1315_WriteBuf(font_dot_10x14[35], 24, bufParams);
-  // SSD1315_WriteBuf(font_dot_5x7[33], 6, bufParams);
-
-
   return 1;
 }
 
