@@ -56,7 +56,7 @@
   I2CDDR  |= _BV(I2CSDA)|_BV(I2CSCL); \
   USIDR   = 0xff; \
   USICR   = _BV(USIWM1)|_BV(USICS1)|_BV(USICLK); \
-  USISR   = _BV(USISIF)|_BV(USIOIF)|_BV(USIPF); \
+  USISR   = _BV(USISIF)|_BV(USIOIF)|_BV(USIPF)|_BV(USIDC); \
 } while (0)
 
 

@@ -16,7 +16,7 @@
 /* Flags definitions */
 #define _I2C_ACKF_    0 // ACK/NACK Flag
 #define _I2C_RWF_     1 // Read/Write Flag (0 - write, 1 - read)
-#define _I2C_BEF_     2 // Bus Error Flag
+#define _I2C_BERF_    2 // Bus Error Flag
 
 
 #define I2CDDR    DDRB

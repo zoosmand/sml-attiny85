@@ -12,20 +12,23 @@
 #define _DISPLAY_H
 
 #include "main.h"
+#include "fonts.h"
+
+#define DSPL_SSD1315
+// #define DSPL_WH1602
    
 /* Exported functions prototypes */
-void WH1602_I2C_Init(void);
-void WH1602_I2C_Write(uint8_t, uint8_t, const char*);
-void WH1602_I2C_Read(uint16_t, uint8_t*);
+uint8_t Init_Display(void);
 int putc_dspl(char, FILE*);
-// int uart_putchar(char c, FILE *stream);
+void WH1602_Write(uint8_t, uint8_t, const char*);
+uint8_t SSD1315_WriteBuf(const uint8_t*, uint16_t, uint8_t, uint8_t, uint8_t, uint8_t);
+
 
 /* --- WH0802A commands --- */
 #define _1602A_ADDR_        0x27 // WH1602 I2C Address
 #define _1602A_8BBUS_       0x03 // 8-bit initial bus initialization
 #define _1602A_CURUPLEFT_   0x02 // Cursor positioin up an left
 #define	_1602A_4BBUS2L_     0x28 // 4-bit bus, LCD of 2 lines
-// #define	_1602A_4BBUS2L_     0x20 // 4-bit bus, LCD of 1 line inverted
 #define _1602A_DSPLSW_	    0x0c // Display on, cursor off, blink off
 #define _1602A_CLRDSLP_     0x01 // Clear display
 #define _1602A_1LS_         0x80 // Position at 1-st line, start 
@@ -44,6 +47,11 @@ int putc_dspl(char, FILE*);
 #define _WR2NCHAR(ch)       ((ch & _1602A_4BMASK_)|_BV(_1602A_Bl)|_BV(_1602A_Rs))
 #define _WR1NCMD(cmd)       ((cmd & _1602A_4BMASK_)|_BV(_1602A_E)|_BV(_1602A_Bl))
 #define _WR2NCMD(cmd)       ((cmd & _1602A_4BMASK_)|_BV(_1602A_Bl))
+
+/* --- SSD1315 commands --- */
+#define _SSD1315_ADDR_      0x3c // SSD1315 I2C Address
+#define _SSD1315_Co_        7 // Co bit
+#define _SSD1315_DC_        6 // DC bit (1 - data, 0 - command)
 
 /* --- Display end of line parameters --- */
 #define _0DCF_              0
