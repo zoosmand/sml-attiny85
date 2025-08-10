@@ -87,9 +87,9 @@ static uint16_t Calc_BufferLength(const char*);
   };
 
   const static uint8_t ssd1315InitCurPosParams[8] PROGMEM = {
-    0x20, 0x01, 
-    0x21, 0x00, 0x0c, 
-    0x22, 0x04, 0x05
+    0x20, 0x00, 
+    0x21, 0x00, 0x05, 
+    0x22, 0x06, 0x06
   };
 
   static uint8_t ssd1315CurrentCurPosParams[8];
@@ -147,9 +147,6 @@ int putc_dspl(char ch, FILE *stream){
   }
 #endif /* DSPL_WH1602 */
 
-
-
-
 #if defined(DSPL_SSD1315)
 
   if ((FLAG_CHECK(_DSPLREG_, _0DCF_)) || (FLAG_CHECK(_DSPLREG_, _0ACF_))) {
@@ -160,7 +157,8 @@ int putc_dspl(char ch, FILE *stream){
     }
   }
   if ((ch != 0x0a) && (ch != 0x0d)) {
-    SSD1315_WriteBuf(font_dot_10x14[(((uint8_t)ch) - 32)], 24, ssd1315CurrentCurPosParams);
+    // SSD1315_WriteBuf(font_dot_10x14[(((uint8_t)ch) - 32)], 24, ssd1315CurrentCurPosParams);
+    SSD1315_WriteBuf(font_dot_5x7[(((uint8_t)ch) - 32)], 6, ssd1315CurrentCurPosParams);
   }
 
 #endif /* DSPL_SSD1315 */
@@ -295,8 +293,16 @@ uint8_t SSD1315_WriteBuf(const uint8_t* buf, uint16_t len, uint8_t* pos) {
   for (uint8_t i = 0; i < 8; i++) {
     if (!SSD1315_WriteCommand(pos[i])) return 0;
   }
-  pos[3] = pos[4]+1;
-  pos[4] = pos[4]+12;
+  
+  if (((pos[4] + 6) & 0x7f) < pos[3]) {
+    pos[3] = 0x00;
+    pos[4] = 0x05;
+    pos[6] = (pos[6] - 1) & 0x07;
+    pos[7] = (pos[7] - 1) & 0x07;
+  } else {
+    pos[3] = pos[4] + 1;
+    pos[4] = pos[4] + 6;
+  }
 
   /* --- Write the buffer --- */
   I2C_Start();
