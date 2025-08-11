@@ -33,6 +33,7 @@
 #include "led.h"
 #include "i2c.h"
 #include "display.h"
+#include "digit_display.h"
 
 
 /* Exported functions */

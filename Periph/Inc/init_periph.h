@@ -60,4 +60,11 @@
 } while (0)
 
 
+/* --- Digital display --- */
+#define	_INIT_DIGIT_DSPL do { \
+  DSPLDDR |= _BV(DSPLDIO)|_BV(DSPLCLK); \
+} while (0)  
+
+
+
 #endif /* INIT_PERIPH_H_ */
