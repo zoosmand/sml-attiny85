@@ -37,19 +37,12 @@ uint8_t OneWire_MatchROM(uint8_t*);
  * @retval  (uint8_t) status of operation
  */
 uint8_t Init_OneWire(void) {
-  // OWPORT &= ~_BV(OW0PIN);
-  // OWDDR &= ~_BV(OW0PIN);
   OW_SP_DOWN;
   
-  // uint8_t ret = 0;
-  // ret = OneWire_Reset();
-  // OneWire_CollectAddresses(EE_OW_ADDR);
-
   if (!OneWire_Reset()) {
-    // OneWire_CollectAddresses(EE_OW_ADDR);
+    OneWire_CollectAddresses(EE_OW_ADDR);
     return 0; // no error during initialization
   }
-  
   return 1; // initialization error
 }
 
@@ -132,24 +125,27 @@ uint8_t OneWire_ReadByte(void) {
 /************************************************************************/
 static void OneWire_CollectAddresses(uint16_t eepromAddr) {
   lastfork = 65;
+  uint8_t bufLen = 8;
   
   while (!OneWire_Enumerate(SearchROM)) {
     uint8_t crc = 0;
-    for (uint8_t i = 0; i < 8; i++) {
+    for (uint8_t i = 0; i < bufLen; i++) {
       crc = OneWire_CRC(crc, addr[i]);
     }
     
     if (!crc) {
-      EEPROM_WriteBuffer(eepromAddr, addr, 8);
-      eepromAddr += 8;
-      // uint8_t owDevCnt = _OWREG_ & 0x0f;
-      // owDevCnt++;
-      // _OWREG_ |= owDevCnt;
+      static uint8_t tmpAddr[8];
+      EEPROM_ReadBuffer(eepromAddr, tmpAddr, bufLen);
+      if (cmpBBufs(addr, tmpAddr, bufLen)) {
+        EEPROM_WriteBuffer(eepromAddr, addr, bufLen);
+      }
+      eepromAddr += bufLen;
       /* Increment OneWire device counter */
       _OWREG_ = (_OWREG_ & 0xf0) | ((_OWREG_ & 0x0f) + 1);
     }
   }
 }
+
 
 
 /************************************************************************/
@@ -166,7 +162,7 @@ void OneWire_CollectAlarms(uint16_t eepromAddr) {
     }
     
     if (!crc) {
-      //EEPROM_WriteBuffer(eepromAddr, addr, 8);
+      EEPROM_WriteBuffer(eepromAddr, addr, 8);
       eepromAddr += 8;
       // owAlDevCnt++;
     }
@@ -190,7 +186,7 @@ uint8_t OneWire_CRC(uint8_t crc, uint8_t data) {
 /*                                                                      */
 /************************************************************************/
 static uint8_t OneWire_Enumerate(uint8_t cmd) {
-  if (!lastfork) return 0;
+  if (!lastfork) return 1;
   
   if (OneWire_Reset()) return 1;
 
