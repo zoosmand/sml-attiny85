@@ -36,6 +36,7 @@ int main(void) {
   Init_ISR();
   Init_Display();
   // Init_DigitalDisplay();
+  Init_OneWire();
   sei();
 
   while (1) {

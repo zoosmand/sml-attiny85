@@ -35,6 +35,7 @@
 #include "display.h"
 #include "digit_display.h"
 #include "eeprom.h"
+#include "ow.h"
 
 
 /* Exported functions */
