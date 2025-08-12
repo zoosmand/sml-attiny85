@@ -34,6 +34,7 @@
 #include "i2c.h"
 #include "display.h"
 #include "digit_display.h"
+#include "eeprom.h"
 
 
 /* Exported functions */

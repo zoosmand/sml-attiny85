@@ -35,7 +35,7 @@ int main(void) {
   _INIT_I2C;
   Init_ISR();
   Init_Display();
-  Init_DigitalDisplay();
+  // Init_DigitalDisplay();
   sei();
 
   while (1) {
@@ -77,16 +77,15 @@ static void Second_Handler(void) {
     stdout = &dsplout;
     printf("sec:%d\n", secCnt);
 
-    static uint8_t digs[4] = {0x0b, 0x0b, 0x0b, 0x0b};
-    digs[0] = secCnt/1000%10;
-    if (secCnt < 1000) digs[0] = 11;
-    digs[1] = secCnt/100%10;
-    if (secCnt < 100) digs[1] = 11;
-    digs[2] = secCnt/10%10;
-    if (secCnt < 10) digs[2] = 11;
-    digs[3] = secCnt%10;
-    DigitalDisplaySend(digs, 0);
-
+    // static uint8_t digs[4] = {0x0b, 0x0b, 0x0b, 0x0b};
+    // digs[0] = secCnt/1000%10;
+    // if (secCnt < 1000) digs[0] = 11;
+    // digs[1] = secCnt/100%10;
+    // if (secCnt < 100) digs[1] = 11;
+    // digs[2] = secCnt/10%10;
+    // if (secCnt < 10) digs[2] = 11;
+    // digs[3] = secCnt%10;
+    // DigitalDisplaySend(digs, 0);
 
   }
 }
