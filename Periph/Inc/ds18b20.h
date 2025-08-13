@@ -24,7 +24,7 @@
 
 
 //////////////////////////////////////////////////////////////////////////
-uint8_t* DS18B20_ReadScrachpad(uint8_t*);
+uint8_t DS18B20_ReadScrachpad(uint8_t*, uint8_t*);
 uint8_t DS18B20_WriteScratchpad(uint8_t*, uint8_t*);
 uint8_t DS18B20_ConvertTemperature(uint8_t*);
 uint8_t DS18B20_CopyScratchpad(uint8_t*);

@@ -9,27 +9,17 @@
  */
 #include "ow.h"
 
+/* Private variables */
 static volatile uint8_t _OWREG_ = 0; // OW device counter is in [3:0], OW devices in alarm mode in [7:4]
 static uint8_t addr[8];
 static uint8_t tmpAddr[8];
 static uint8_t lastfork;
 static uint8_t addrBufLen = 8;
 
-
-
-uint8_t OneWire_Reset(void);
-uint8_t OneWire_Init(void);
+/* Private function definitions */
 static void OneWire_WriteBit(uint8_t);
-uint8_t OneWire_ReadBit(void);
-void OneWire_WriteByte(uint8_t);
-uint8_t OneWire_ReadByte(void);
 static void OneWire_CollectAddresses(uint16_t);
-void OneWire_CollectAlarms(uint16_t);
-uint8_t OneWire_CRC(uint8_t, uint8_t);
 static uint8_t OneWire_Enumerate(uint8_t);
-uint8_t OneWire_ReadPowerSupply(uint8_t*);
-uint8_t OneWire_MatchROM(uint8_t*);
-
 
 
 /**
@@ -196,7 +186,7 @@ uint8_t OneWire_CRC(uint8_t crc, uint8_t data) {
 
 
 /**
- * @brief   Enumerates OneWire device addresses. Realizes DTREE method.
+ * @brief   Enumerates OneWire device addresses. Realizes BTREE traversal method.
  * @param   cmd OneOre bus command
  * @retval  (uint8_t) status of operation
  */
@@ -259,11 +249,10 @@ static uint8_t OneWire_Enumerate(uint8_t cmd) {
 }
 
 
-
 /**
  * @brief   Defines parasitic powered devices on OnWire bus.
  * @param   addr pointer to OneWire device address
- * @retval  (uint8_t) status of operation
+ * @retval  (uint8_t) status of power supply
  */
 uint8_t OneWire_ReadPowerSupply(uint8_t* addr) {
   OneWire_MatchROM(addr);
@@ -271,7 +260,6 @@ uint8_t OneWire_ReadPowerSupply(uint8_t* addr) {
   
   return !OneWire_ReadBit();
 }
-
 
 
 /**
