@@ -39,6 +39,8 @@ int main(void) {
   Init_OneWire();
   sei();
 
+  GetTemperature();
+
   while (1) {
     Cron_Handler();
     Second_Handler();
@@ -76,7 +78,7 @@ static void Second_Handler(void) {
     LedToggle_Handler();
 
     stdout = &dsplout;
-    printf("sec:%d\n", secCnt);
+    printf("sec:%u\n", secCnt);
 
     // static uint8_t digs[4] = {0x0b, 0x0b, 0x0b, 0x0b};
     // digs[0] = secCnt/1000%10;

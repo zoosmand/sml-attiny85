@@ -62,7 +62,7 @@ uint8_t OneWire_CRC(uint8_t, uint8_t);
 void OneWire_CollectAlarms(uint16_t);
 uint8_t OneWire_ReadPowerSupply(uint8_t*);
 uint8_t OneWire_MatchROM(uint8_t*);
-
+volatile uint8_t* Get_OWREG(void);
 
 
 #endif /* ONEWIRE_H_ */

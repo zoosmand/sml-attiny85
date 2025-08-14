@@ -268,7 +268,7 @@ uint8_t OneWire_ReadPowerSupply(uint8_t* addr) {
  * @retval  (uint8_t) status of operation
  */
 uint8_t OneWire_MatchROM(uint8_t* addr) {
-  if (!OneWire_Reset()) return 1;
+  if (OneWire_Reset()) return 1;
   
   OneWire_WriteByte(MatchROM);
   for (uint8_t i = 0; i < addrBufLen; i++) {
@@ -278,3 +278,8 @@ uint8_t OneWire_MatchROM(uint8_t* addr) {
   return 0;
 }
 
+
+/* Getters */
+volatile uint8_t* Get_OWREG(void) {
+  return &_OWREG_;
+}

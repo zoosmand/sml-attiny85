@@ -80,7 +80,7 @@ uint8_t DS18B20_ConvertTemperature(uint8_t* addr) {
     while(!OneWire_ReadBit());
   }
   
-  return 1;
+  return 0;
 }
 
 
