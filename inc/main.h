@@ -45,6 +45,8 @@ volatile uint8_t* Get_GREG(void);
 volatile uint16_t* Get_SysCnt(void);
 volatile uint16_t Get_SecCnt(void);
 
+FILE* Init_DsplOut(void);
+
 void Init_ISR(void);
 void _delay_us(uint16_t);
 uint8_t cmpBBufs(uint8_t*, uint8_t*, uint16_t);

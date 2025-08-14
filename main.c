@@ -14,7 +14,7 @@ static volatile uint8_t   _GREG_  = 0;
 static volatile uint16_t  sysCnt  = 0;
 static volatile uint16_t  secCnt  = 0;
 
-static void Cron_Handler(void);
+static void SysTick_Handler(void);
 static void Second_Handler(void);
 
 static FILE dsplout = FDEV_SETUP_STREAM(putc_dspl, NULL, _FDEV_SETUP_WRITE);
@@ -39,10 +39,11 @@ int main(void) {
   Init_OneWire();
   sei();
 
-  GetTemperature();
+  /* --- Init default standard output into display --- */
+  stdout = Init_DsplOut();
 
-  while (1) {
-    Cron_Handler();
+   while (1) {
+    SysTick_Handler();
     Second_Handler();
   }
 
@@ -53,7 +54,7 @@ int main(void) {
  * @brief   The application system cron service handler.
  * @retval  none
  */
-static void Cron_Handler(void) {
+static void SysTick_Handler(void) {
   cli();
   if (FLAG_CHECK(_GREG_, _SYSTF_)) {
     FLAG_CLR(_GREG_, _SYSTF_);
@@ -77,7 +78,6 @@ static void Second_Handler(void) {
     FLAG_CLR(_GREG_, _SECTF_);
     LedToggle_Handler();
 
-    stdout = &dsplout;
     printf("sec:%u\n", secCnt);
 
     // static uint8_t digs[4] = {0x0b, 0x0b, 0x0b, 0x0b};
@@ -89,6 +89,8 @@ static void Second_Handler(void) {
     // if (secCnt < 10) digs[2] = 11;
     // digs[3] = secCnt%10;
     // DigitalDisplaySend(digs, 0);
+    GetTemperature_Scheduler();
+
 
   }
 }
@@ -105,6 +107,10 @@ volatile uint16_t* Get_SysCnt(void) {
 
 volatile uint16_t Get_SecCnt(void) {
   return secCnt;
+}
+
+FILE* Init_DsplOut(void) {
+  return &dsplout;
 }
 
 

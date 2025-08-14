@@ -11,7 +11,6 @@
 
 
 
-
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -59,21 +58,7 @@ uint8_t DS18B20_ConvertTemperature(uint8_t* addr) {
   
   if (pps) {
     OW_SP_UP;
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
+    /* TODO implement a proper pause of 750ms */
     OW_SP_DOWN;
   } else {
     /* TDOD implement timeout, handle independently */
@@ -97,7 +82,7 @@ uint8_t DS18B20_CopyScratchpad(uint8_t* addr) {
 
   if (pps) {
     OW_SP_UP;
-    _delay_us(10000);
+    /* TODO implement a proper pause of 10ms */
     OW_SP_DOWN;
   } else {
     /* TDOD implement timeout, handle independently */

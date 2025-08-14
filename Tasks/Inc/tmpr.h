@@ -13,7 +13,7 @@
 
 #include "main.h"
 
-uint8_t GetTemperature(void);
+uint8_t GetTemperature_Scheduler(void);
 
 
 #endif /* TMPR_H_ */
