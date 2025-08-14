@@ -78,7 +78,7 @@ static void Second_Handler(void) {
     FLAG_CLR(_GREG_, _SECTF_);
     LedToggle_Handler();
 
-    printf("sec:%u\n", secCnt);
+    // printf("sec:%u\n", secCnt);
 
     // static uint8_t digs[4] = {0x0b, 0x0b, 0x0b, 0x0b};
     // digs[0] = secCnt/1000%10;
