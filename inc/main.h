@@ -33,6 +33,11 @@
 #include "led.h"
 #include "i2c.h"
 #include "display.h"
+#include "digit_display.h"
+#include "eeprom.h"
+#include "ow.h"
+#include "ds18b20.h"
+#include "tmpr.h"
 
 
 /* Exported functions */
@@ -40,8 +45,11 @@ volatile uint8_t* Get_GREG(void);
 volatile uint16_t* Get_SysCnt(void);
 volatile uint16_t Get_SecCnt(void);
 
+FILE* Init_DsplOut(void);
+
 void Init_ISR(void);
 void _delay_us(uint16_t);
+uint8_t cmpBBufs(uint8_t*, uint8_t*, uint16_t);
 
 
 #endif /* MAIN_H_ */
