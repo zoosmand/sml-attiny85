@@ -14,8 +14,8 @@
 #include "main.h"
 #include "fonts.h"
 
-#define DSPL_SSD1315
-// #define DSPL_WH1602
+// #define DSPL_SSD1315
+#define DSPL_WH1602
    
 /* Exported functions prototypes */
 uint8_t Init_Display(void);
