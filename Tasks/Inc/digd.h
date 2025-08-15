@@ -14,7 +14,7 @@
 #include "main.h"
 
 /* --- Periodial step value --- */
-#define SRV_STEP  500 // here is a millis value that derives from sysCnt
+#define DIGD_SRV_STEP  500 // here is a millis value that derives from sysCnt
 
 
 uint8_t GetTemperature_Scheduler(void);

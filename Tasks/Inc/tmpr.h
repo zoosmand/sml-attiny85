@@ -14,7 +14,7 @@
 #include "main.h"
 
 /* --- Periodial step value --- */
-#define SRV_STEP  4 // here is a sec value that derives from secCnt
+#define TMPR_SRV_STEP  4 // here is a sec value that derives from secCnt
 
 
 uint8_t PrintDigitalDisplay_Scheduler(void);
