@@ -29,10 +29,13 @@ uint8_t GetTemperature_Scheduler(void) {
     /* --- Init default standard output into display --- */
     stdout = Init_DsplOut();
 
-
-    for (uint8_t i = 0; i < (*_owreg & 0x0f); i++) {
-      if (GetTemperatur_Handler(i)) printf("Fail:%u\n", i);
-    }
+    // for (uint8_t i = 0; i < (*_owreg & 0x0f); i++) {
+      //   if (GetTemperatur_Handler(i)) printf("Fail:%u\n", i);
+      // }
+      /* --- Get tepmperatur from the given device "0  " --- */
+    if (GetTemperatur_Handler(0)) printf("Fail:%u\n", 0);
+    
+    /* --- Increase the next step --- */
     secStep = secCnt + TMPR_SRV_STEP;
   }
 
