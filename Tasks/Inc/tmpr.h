@@ -7,13 +7,17 @@
  * Created: 13.08.2025 08:55:29 PM
  * Author: Dmitry Slobodchikov
 */ 
-#ifndef TMPR_H_
-#define TMPR_H_
+#ifndef DIGD_H_
+#define DIGD_H_
 
 
 #include "main.h"
 
-uint8_t GetTemperature_Scheduler(void);
+/* --- Periodial step value --- */
+#define SRV_STEP  4 // here is a sec value that derives from secCnt
 
 
-#endif /* TMPR_H_ */
+uint8_t PrintDigitalDisplay_Scheduler(void);
+
+
+#endif /* DIGD_H_ */

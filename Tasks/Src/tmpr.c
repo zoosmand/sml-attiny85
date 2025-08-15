@@ -11,7 +11,7 @@
 
 /* Private variables */
 volatile static uint8_t* _owreg;
-static uint16_t secStep = 4;
+static uint16_t secStep = SRV_STEP;
 
 /* Private function definitions */
 static uint8_t GetTemperatur_Handler(uint8_t);
@@ -33,7 +33,7 @@ uint8_t GetTemperature_Scheduler(void) {
     for (uint8_t i = 0; i < (*_owreg & 0x0f); i++) {
       if (GetTemperatur_Handler(i)) printf("Fail:%u\n", i);
     }
-    secStep = secCnt + 4;
+    secStep = secCnt + SRV_STEP;
   }
 
   return 0;

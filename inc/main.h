@@ -37,6 +37,8 @@
 #include "eeprom.h"
 #include "ow.h"
 #include "ds18b20.h"
+
+#include "digd.h"
 #include "tmpr.h"
 
 

@@ -45,6 +45,7 @@ int main(void) {
    while (1) {
     SysTick_Handler();
     Second_Handler();
+    // PrintDigitalDisplay_Scheduler();
   }
 
 }
@@ -79,19 +80,7 @@ static void Second_Handler(void) {
     LedToggle_Handler();
 
     // printf("sec:%u\n", secCnt);
-
-    // static uint8_t digs[4] = {0x0b, 0x0b, 0x0b, 0x0b};
-    // digs[0] = secCnt/1000%10;
-    // if (secCnt < 1000) digs[0] = 11;
-    // digs[1] = secCnt/100%10;
-    // if (secCnt < 100) digs[1] = 11;
-    // digs[2] = secCnt/10%10;
-    // if (secCnt < 10) digs[2] = 11;
-    // digs[3] = secCnt%10;
-    // DigitalDisplaySend(digs, 0);
     GetTemperature_Scheduler();
-
-
   }
 }
 
