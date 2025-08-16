@@ -21,6 +21,7 @@
 /* Flags definitions */
 #define _SYSTF_   0 // System Tick Flag
 #define _SECTF_   1 // Seconds Tick Flag
+#define _DF_      2 // Delay Flag
 
 
 #endif /* DEF_H_ */

@@ -65,6 +65,7 @@ uint8_t DS18B20_ConvertTemperature(uint8_t* addr) {
   if (pps) {
     OW_SP_UP;
     /* TODO implement a proper pause of 750ms */
+    _delay_ms(750);
     OW_SP_DOWN;
   } else {
     /* TDOD implement timeout, handle independently */
@@ -90,6 +91,7 @@ uint8_t DS18B20_CopyScratchpad(uint8_t* addr) {
   if (pps) {
     OW_SP_UP;
     /* TODO implement a proper pause of 10ms */
+    _delay_ms(10);
     OW_SP_DOWN;
   } else {
     /* TDOD implement timeout, handle independently */

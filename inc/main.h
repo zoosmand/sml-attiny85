@@ -53,5 +53,7 @@ void Init_ISR(void);
 void _delay_us(uint16_t);
 uint8_t cmpBBufs(uint8_t*, uint8_t*, uint16_t);
 
+void _delay_ms(uint16_t);
+
 
 #endif /* MAIN_H_ */

@@ -14,10 +14,13 @@ static volatile uint8_t   _GREG_  = 0;
 static volatile uint16_t  sysCnt  = 0;
 static volatile uint16_t  secCnt  = 0;
 
+static void Cron(void);
 static void SysTick_Handler(void);
 static void Second_Handler(void);
 
 static FILE dsplout = FDEV_SETUP_STREAM(putc_dspl, NULL, _FDEV_SETUP_WRITE);
+
+static uint16_t* callback = 0;
 
 
 
@@ -41,13 +44,17 @@ int main(void) {
 
   /* --- Init default standard output into display --- */
   stdout = Init_DsplOut();
+  Cron();
 
+}
+
+
+static void Cron(void) {
    while (1) {
     SysTick_Handler();
     Second_Handler();
     // PrintDigitalDisplay_Scheduler();
   }
-
 }
 
 
@@ -82,6 +89,35 @@ static void Second_Handler(void) {
     // printf("sec:%u\n", secCnt);
     GetTemperature_Scheduler();
   }
+}
+
+
+void _delay_ms(uint16_t delay) {
+
+  if (delay == 750) {
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+    _delay_us(50000);
+  }
+
+  if (delay == 10) {
+    _delay_us(10000);
+  }
+
 }
 
 
