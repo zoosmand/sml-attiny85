@@ -14,7 +14,12 @@
 #include "ow.h"
 #include "eeprom.h"
 
-//////////////////////////////////////////////////////////////////////////
+
+/* Flags definitions */
+#define _DSDF_            0 // Delay Flag
+
+
+/* --- DS18B20 spwcific commands --- */
 #define ConvertT          0x44
 #define WriteScratchpad   0x4e
 #define ReadScratchpad    0xbe
@@ -22,13 +27,15 @@
 #define RecallEeprom      0xb8
 
 
-
-//////////////////////////////////////////////////////////////////////////
+/* Exported functions */
 uint8_t DS18B20_ReadScrachpad(uint8_t*, uint8_t*);
 uint8_t DS18B20_WriteScratchpad(uint8_t*, uint8_t*);
 uint8_t DS18B20_ConvertTemperature(uint8_t*);
 uint8_t DS18B20_CopyScratchpad(uint8_t*);
 uint8_t DS18B20_RecallEeprom(uint8_t*);
+
+volatile uint8_t* Get_DSREG(void);
+
 
 
 #endif /* DS18B20_H_ */

@@ -62,7 +62,6 @@ static void Dd_Stop(void) {
 }
 
 
-
 /**
  * @brief  Digital display write/send a by to the bus
  * @param  byte A byte to send/write
