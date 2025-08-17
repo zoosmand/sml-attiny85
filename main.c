@@ -10,13 +10,17 @@
 
 #include "main.h"
 
+/* Private variables */
 static volatile uint8_t   _GREG_  = 0;
 static volatile uint16_t  sysCnt  = 0;
 static volatile uint16_t  secCnt  = 0;
 
+/* Private function definitions */
+static void Cron(void);
 static void SysTick_Handler(void);
 static void Second_Handler(void);
 
+/* STDOUT definition */
 static FILE dsplout = FDEV_SETUP_STREAM(putc_dspl, NULL, _FDEV_SETUP_WRITE);
 
 
@@ -42,11 +46,20 @@ int main(void) {
   /* --- Init default standard output into display --- */
   stdout = Init_DsplOut();
 
-   while (1) {
-    SysTick_Handler();
-    Second_Handler();
+  while (1) {
+    Cron();
   }
 
+}
+
+
+/**
+ * @brief   The application system cron service handler.
+ * @retval  none
+ */
+static void Cron(void) {
+  SysTick_Handler();
+  Second_Handler();
 }
 
 
@@ -64,35 +77,43 @@ static void SysTick_Handler(void) {
       secCnt++;
       FLAG_SET(_GREG_, _SECTF_);
     }
+    /* --- Millis dependent services --- */
+    LedToggle_Scheduler();
   }
   sei();
 }
 
 
 /**
- * @brief   The application periodical event handler (secondly.)
- * @retval  none
- */
+* @brief   The application periodical event handler (secondly.)
+* @retval  none
+*/
 static void Second_Handler(void) {
   if (FLAG_CHECK(_GREG_, _SECTF_)) {
     FLAG_CLR(_GREG_, _SECTF_);
-    LedToggle_Handler();
-
-    // printf("sec:%u\n", secCnt);
-
-    // static uint8_t digs[4] = {0x0b, 0x0b, 0x0b, 0x0b};
-    // digs[0] = secCnt/1000%10;
-    // if (secCnt < 1000) digs[0] = 11;
-    // digs[1] = secCnt/100%10;
-    // if (secCnt < 100) digs[1] = 11;
-    // digs[2] = secCnt/10%10;
-    // if (secCnt < 10) digs[2] = 11;
-    // digs[3] = secCnt%10;
-    // DigitalDisplaySend(digs, 0);
+    
+    /* --- Seconds dependent services --- */
+    Print_Scheduler();
+    // PrintDigitalDisplay_Scheduler();
     GetTemperature_Scheduler();
-
-
   }
+}
+
+
+/**
+ * @brief   Simple millisecond-step delay.
+ * @param   delay delay value in millis
+ * @param   reg pointer to the control register
+ * @param   flag control flag
+ * @retval  none
+ */
+void _delay_ms(uint16_t delay, volatile uint8_t* reg, uint8_t flag) {
+  FLAG_SET(*reg, flag);
+  uint16_t tmpDelay = (sysCnt + delay) & SEC_TICK_MASK;
+  while (tmpDelay != sysCnt) {
+    Cron();
+  }
+  FLAG_CLR(*reg, flag);
 }
 
 

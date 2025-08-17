@@ -37,7 +37,11 @@
 #include "eeprom.h"
 #include "ow.h"
 #include "ds18b20.h"
+
+#include "digd.h"
 #include "tmpr.h"
+#include "led.h"
+#include "prnt.h"
 
 
 /* Exported functions */
@@ -49,7 +53,9 @@ FILE* Init_DsplOut(void);
 
 void Init_ISR(void);
 void _delay_us(uint16_t);
+void _delay_ms(uint16_t, volatile uint8_t*, uint8_t);
 uint8_t cmpBBufs(uint8_t*, uint8_t*, uint16_t);
+
 
 
 #endif /* MAIN_H_ */
