@@ -73,21 +73,21 @@ static void SysTick_Handler(void) {
       secCnt++;
       FLAG_SET(_GREG_, _SECTF_);
     }
-    GetTemperature_Scheduler();
+    LedToggle_Scheduler();
   }
   sei();
 }
 
 
 /**
- * @brief   The application periodical event handler (secondly.)
- * @retval  none
- */
+* @brief   The application periodical event handler (secondly.)
+* @retval  none
+*/
 static void Second_Handler(void) {
   if (FLAG_CHECK(_GREG_, _SECTF_)) {
     FLAG_CLR(_GREG_, _SECTF_);
-    LedToggle_Handler();
-
+    
+    GetTemperature_Scheduler();
     // printf("sec:%u\n", secCnt);
   }
 }

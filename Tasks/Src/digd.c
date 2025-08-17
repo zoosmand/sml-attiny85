@@ -11,7 +11,7 @@
 
 /* Private variables */
 // volatile static uint8_t* _ddreg;
-static uint16_t sysStep = DIGD_SRV_STEP;
+static uint16_t taskCnt = DIGD_SRV_STEP;
 
 /* Private function definitions */
 static uint8_t PrintDigitalDisplay_Handler(void);
@@ -25,9 +25,9 @@ static uint8_t PrintDigitalDisplay_Handler(void);
 uint8_t PrintDigitalDisplay_Scheduler(void) {
   volatile uint16_t* sysCnt = Get_SysCnt();
 
-  if (sysStep == *sysCnt) {
+  if (taskCnt == *sysCnt) {
     if (PrintDigitalDisplay_Handler()) return 1;
-    sysStep = *sysCnt + DIGD_SRV_STEP;
+    taskCnt = (*sysCnt + DIGD_SRV_STEP) & SEC_TICK_MASK;
   }
 
   return 0;
