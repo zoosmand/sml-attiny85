@@ -9,6 +9,9 @@
  */
 #include "ds18b20.h"
 
+/* Private variables */
+static volatile uint8_t  _DSREG_  = 0;
+
 
 /**
  * @brief   Reads the data scratchpad of the given device.
@@ -64,8 +67,7 @@ uint8_t DS18B20_ConvertTemperature(uint8_t* addr) {
   
   if (pps) {
     OW_SP_UP;
-    /* TODO implement a proper pause of 750ms */
-    _delay_ms(750);
+    _delay_ms(750, &_DSREG_, _DSDF_);
     OW_SP_DOWN;
   } else {
     /* TDOD implement timeout, handle independently */
@@ -90,8 +92,7 @@ uint8_t DS18B20_CopyScratchpad(uint8_t* addr) {
 
   if (pps) {
     OW_SP_UP;
-    /* TODO implement a proper pause of 10ms */
-    _delay_ms(10);
+    _delay_ms(10, &_DSREG_, _DSDF_);
     OW_SP_DOWN;
   } else {
     /* TDOD implement timeout, handle independently */
@@ -115,4 +116,10 @@ uint8_t DS18B20_RecallEeprom(uint8_t* addr) {
   while(!OneWire_ReadBit());
   
   return 0;
+}
+
+
+/* Getters */
+volatile uint8_t* Get_DSREG(void) {
+  return &_DSREG_;
 }

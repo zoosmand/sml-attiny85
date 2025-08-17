@@ -10,17 +10,18 @@
 
 #include "main.h"
 
+/* Private variables */
 static volatile uint8_t   _GREG_  = 0;
 static volatile uint16_t  sysCnt  = 0;
 static volatile uint16_t  secCnt  = 0;
 
+/* Private function definitions */
 static void Cron(void);
 static void SysTick_Handler(void);
 static void Second_Handler(void);
 
+/* STDOUT definition */
 static FILE dsplout = FDEV_SETUP_STREAM(putc_dspl, NULL, _FDEV_SETUP_WRITE);
-
-static uint16_t* callback = 0;
 
 
 
@@ -72,6 +73,7 @@ static void SysTick_Handler(void) {
       secCnt++;
       FLAG_SET(_GREG_, _SECTF_);
     }
+    GetTemperature_Scheduler();
   }
   sei();
 }
@@ -87,37 +89,25 @@ static void Second_Handler(void) {
     LedToggle_Handler();
 
     // printf("sec:%u\n", secCnt);
-    GetTemperature_Scheduler();
   }
 }
 
 
-void _delay_ms(uint16_t delay) {
-
-  if (delay == 750) {
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
-    _delay_us(50000);
+/**
+ * @brief   Simple millisecond-step delay.
+ * @param   delay delay value in millis
+ * @param   reg pointer to the control register
+ * @param   flag control flag
+ * @retval  none
+ */
+void _delay_ms(uint16_t delay, volatile uint8_t* reg, uint8_t flag) {
+  FLAG_SET(*reg, flag);
+  uint16_t tmpDelay = (sysCnt + delay) & SEC_TICK_MASK;
+  while (tmpDelay != sysCnt) {
+    SysTick_Handler();
+    Second_Handler();
   }
-
-  if (delay == 10) {
-    _delay_us(10000);
-  }
-
+  FLAG_CLR(*reg, flag);
 }
 
 

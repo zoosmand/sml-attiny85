@@ -11,6 +11,7 @@
 
 /* Private variables */
 volatile static uint8_t* _owreg;
+volatile static uint8_t* _dsreg;
 static uint16_t secStep = TMPR_SRV_STEP;
 
 /* Private function definitions */
@@ -22,6 +23,9 @@ static uint8_t GetTemperatur_Handler(uint8_t);
  * @retval  (uint8_t) status of operation
  */
 uint8_t GetTemperature_Scheduler(void) {
+  _dsreg = Get_DSREG();
+  if (FLAG_CHECK(*_dsreg, _DSDF_)) return 1;
+
   uint16_t secCnt = Get_SecCnt();
 
   if (secStep == secCnt) {
