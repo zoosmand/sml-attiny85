@@ -23,13 +23,14 @@ static uint8_t LedToggle_Handler(void);
  * @retval  (uint8_t) status of operation
  */
 uint8_t LedToggle_Scheduler(void) {
-  volatile uint16_t* sysCnt = Get_SysCnt();
+  // volatile uint16_t* sysCnt = Get_SysCnt();
 
-  if (taskCnt == *sysCnt) {
+  // if (taskCnt == *sysCnt) {
+  if (!(taskCnt--)) {
     if (LedToggle_Handler()) return 1;
-    taskCnt = (*sysCnt + LED_SRV_STEP) & SEC_TICK_MASK;
+    // taskCnt = (*sysCnt + LED_SRV_STEP) & SEC_TICK_MASK;
+     taskCnt = LED_SRV_STEP;
   }
-
   return 0;
 }
 

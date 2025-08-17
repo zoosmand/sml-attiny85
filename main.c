@@ -45,17 +45,17 @@ int main(void) {
 
   /* --- Init default standard output into display --- */
   stdout = Init_DsplOut();
-  Cron();
+
+  while (1) {
+    Cron();
+  }
 
 }
 
 
 static void Cron(void) {
-   while (1) {
-    SysTick_Handler();
-    Second_Handler();
-    // PrintDigitalDisplay_Scheduler();
-  }
+  SysTick_Handler();
+  Second_Handler();
 }
 
 
@@ -73,6 +73,7 @@ static void SysTick_Handler(void) {
       secCnt++;
       FLAG_SET(_GREG_, _SECTF_);
     }
+    /* --- Millis dependent services --- */
     LedToggle_Scheduler();
   }
   sei();
@@ -87,7 +88,9 @@ static void Second_Handler(void) {
   if (FLAG_CHECK(_GREG_, _SECTF_)) {
     FLAG_CLR(_GREG_, _SECTF_);
     
+    /* --- Seconds dependent services --- */
     GetTemperature_Scheduler();
+    // PrintDigitalDisplay_Scheduler();
     // printf("sec:%u\n", secCnt);
   }
 }
@@ -104,8 +107,9 @@ void _delay_ms(uint16_t delay, volatile uint8_t* reg, uint8_t flag) {
   FLAG_SET(*reg, flag);
   uint16_t tmpDelay = (sysCnt + delay) & SEC_TICK_MASK;
   while (tmpDelay != sysCnt) {
-    SysTick_Handler();
-    Second_Handler();
+    // SysTick_Handler();
+    // Second_Handler();
+    Cron();
   }
   FLAG_CLR(*reg, flag);
 }

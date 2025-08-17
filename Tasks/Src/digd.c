@@ -23,11 +23,13 @@ static uint8_t PrintDigitalDisplay_Handler(void);
  * @retval  (uint8_t) status of operation
  */
 uint8_t PrintDigitalDisplay_Scheduler(void) {
-  volatile uint16_t* sysCnt = Get_SysCnt();
+  // volatile uint16_t* sysCnt = Get_SysCnt();
 
-  if (taskCnt == *sysCnt) {
+  // if (taskCnt == *sysCnt) {
+  if (!(taskCnt--)) {
     if (PrintDigitalDisplay_Handler()) return 1;
-    taskCnt = (*sysCnt + DIGD_SRV_STEP) & SEC_TICK_MASK;
+    // taskCnt = (*sysCnt + DIGD_SRV_STEP) & SEC_TICK_MASK;
+    taskCnt = DIGD_SRV_STEP;
   }
 
   return 0;

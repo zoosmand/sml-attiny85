@@ -12,7 +12,7 @@
 /* Private variables */
 volatile static uint8_t* _owreg;
 volatile static uint8_t* _dsreg;
-static uint16_t secStep = TMPR_SRV_STEP;
+static uint16_t taskCnt = TMPR_SRV_STEP;
 
 /* Private function definitions */
 static uint8_t GetTemperatur_Handler(uint8_t);
@@ -26,9 +26,10 @@ uint8_t GetTemperature_Scheduler(void) {
   _dsreg = Get_DSREG();
   if (FLAG_CHECK(*_dsreg, _DSDF_)) return 1;
 
-  uint16_t secCnt = Get_SecCnt();
+  // uint16_t secCnt = Get_SecCnt();
 
-  if (secStep == secCnt) {
+  // if (taskCnt == secCnt) {
+  if (!(taskCnt--)) {
     _owreg = Get_OWREG();
     /* --- Init default standard output into display --- */
     stdout = Init_DsplOut();
@@ -40,9 +41,9 @@ uint8_t GetTemperature_Scheduler(void) {
     if (GetTemperatur_Handler(0)) printf("Fail:%u\n", 0);
     
     /* --- Increase the next step --- */
-    secStep = secCnt + TMPR_SRV_STEP;
+    // taskCnt = secCnt + TMPR_SRV_STEP;
+    taskCnt = TMPR_SRV_STEP;
   }
-
   return 0;
 }
 
