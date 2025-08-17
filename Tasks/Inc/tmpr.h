@@ -18,6 +18,7 @@
 
 
 uint8_t PrintDigitalDisplay_Scheduler(void);
+uint8_t* Get_Spad(void);
 
 
 #endif /* DIGD_H_ */

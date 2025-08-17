@@ -40,6 +40,8 @@
 
 #include "digd.h"
 #include "tmpr.h"
+#include "led.h"
+#include "prnt.h"
 
 
 /* Exported functions */

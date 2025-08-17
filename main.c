@@ -53,6 +53,10 @@ int main(void) {
 }
 
 
+/**
+ * @brief   The application system cron service handler.
+ * @retval  none
+ */
 static void Cron(void) {
   SysTick_Handler();
   Second_Handler();
@@ -89,9 +93,9 @@ static void Second_Handler(void) {
     FLAG_CLR(_GREG_, _SECTF_);
     
     /* --- Seconds dependent services --- */
-    GetTemperature_Scheduler();
+    Print_Scheduler();
     // PrintDigitalDisplay_Scheduler();
-    // printf("sec:%u\n", secCnt);
+    GetTemperature_Scheduler();
   }
 }
 
@@ -107,8 +111,6 @@ void _delay_ms(uint16_t delay, volatile uint8_t* reg, uint8_t flag) {
   FLAG_SET(*reg, flag);
   uint16_t tmpDelay = (sysCnt + delay) & SEC_TICK_MASK;
   while (tmpDelay != sysCnt) {
-    // SysTick_Handler();
-    // Second_Handler();
     Cron();
   }
   FLAG_CLR(*reg, flag);

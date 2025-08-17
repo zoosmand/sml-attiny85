@@ -10,7 +10,6 @@
 #include "led.h"
 
 /* Private variables */
-// volatile static uint8_t* _ddreg;
 static uint16_t taskCnt = LED_SRV_STEP;
 
 /* Private function definitions */
@@ -23,12 +22,8 @@ static uint8_t LedToggle_Handler(void);
  * @retval  (uint8_t) status of operation
  */
 uint8_t LedToggle_Scheduler(void) {
-  // volatile uint16_t* sysCnt = Get_SysCnt();
-
-  // if (taskCnt == *sysCnt) {
-  if (!(taskCnt--)) {
+  if (!(--taskCnt)) {
     if (LedToggle_Handler()) return 1;
-    // taskCnt = (*sysCnt + LED_SRV_STEP) & SEC_TICK_MASK;
      taskCnt = LED_SRV_STEP;
   }
   return 0;

@@ -13,6 +13,9 @@
 volatile static uint8_t* _owreg;
 volatile static uint8_t* _dsreg;
 static uint16_t taskCnt = TMPR_SRV_STEP;
+static uint8_t curAddr[8];
+static uint8_t spad[9];
+
 
 /* Private function definitions */
 static uint8_t GetTemperatur_Handler(uint8_t);
@@ -26,22 +29,17 @@ uint8_t GetTemperature_Scheduler(void) {
   _dsreg = Get_DSREG();
   if (FLAG_CHECK(*_dsreg, _DSDF_)) return 1;
 
-  // uint16_t secCnt = Get_SecCnt();
-
-  // if (taskCnt == secCnt) {
-  if (!(taskCnt--)) {
+  if (!(--taskCnt)) {
     _owreg = Get_OWREG();
-    /* --- Init default standard output into display --- */
-    stdout = Init_DsplOut();
-
     // for (uint8_t i = 0; i < (*_owreg & 0x0f); i++) {
       //   if (GetTemperatur_Handler(i)) printf("Fail:%u\n", i);
       // }
-      /* --- Get tepmperatur from the given device "0  " --- */
-    if (GetTemperatur_Handler(0)) printf("Fail:%u\n", 0);
-    
-    /* --- Increase the next step --- */
-    // taskCnt = secCnt + TMPR_SRV_STEP;
+    /* --- Get tepmperatur from the given device "0" --- */
+    if (GetTemperatur_Handler(0)) {
+      /* --- on error, set up -128.00 C --- */
+      spad[0] = 0x00;
+      spad[1] = 0x08;
+    }
     taskCnt = TMPR_SRV_STEP;
   }
   return 0;
@@ -56,15 +54,16 @@ uint8_t GetTemperature_Scheduler(void) {
 static uint8_t GetTemperatur_Handler(uint8_t num) {
   if (num >= *_owreg) return 1;
 
-  uint8_t addr[8];
-  uint8_t spad[9];
-
-  if (EEPROM_ReadBuffer(EE_OW_ADDR + (num * 8), addr, 8)) return 1;
-  if (DS18B20_ConvertTemperature(addr)) return 1;
-  if (DS18B20_ReadScrachpad(addr, spad)) return 1;
-  uint16_t* t1 = (uint16_t*)spad;
-  
-  printf("T:%d.%02u\n", (int16_t)(*t1 >> 4), (uint8_t)(((*t1 & 0x000f) * 100) >> 4));
+  if (EEPROM_ReadBuffer(EE_OW_ADDR + (num * 8), curAddr, 8)) return 1;
+  if (DS18B20_ConvertTemperature(curAddr)) return 1;
+  if (DS18B20_ReadScrachpad(curAddr, spad)) return 1;
 
   return 0;
 }
+
+
+/* Getters */
+uint8_t* Get_Spad(void) {
+  return spad;
+}
+
