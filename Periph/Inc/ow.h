@@ -41,10 +41,12 @@
 } while (0)
 
 
+/* --- EEPROM addresse pointter --- */
 #define EE_OW_ADDR        0x0040
 #define EE_OW_ALAD        0x00c0
 
 
+/* --- OneWire device spwcific commands --- */
 #define SearchROM         0xf0
 #define SearchAlarmROM    0xec
 #define ReadROM           0x33
@@ -53,6 +55,7 @@
 #define ReadPowerSupply   0xb4
 
 
+/* Exported functions */
 uint8_t Init_OneWire(void);
 uint8_t OneWire_Reset(void);
 uint8_t OneWire_ReadBit(void);

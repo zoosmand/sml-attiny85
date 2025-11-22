@@ -9,11 +9,17 @@
  */
 #include "ds18b20.h"
 
+/* Private variables */
+static volatile uint8_t  _DSREG_  = 0;
 
 
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
+/**
+ * @brief   Reads the data scratchpad of the given device.
+ * @param   addr a pointer to address of the given device
+ * @param   buf a pointer to buffer to write data that has been read from the given device
+ *          the size of the buffer is 9, the last byte is CRC
+ * @retval  (uint8_t) status of operation
+ */
 uint8_t DS18B20_ReadScrachpad(uint8_t* addr, uint8_t* buf) {
   if (OneWire_MatchROM(addr)) return 1;
   OneWire_WriteByte(ReadScratchpad);
@@ -29,10 +35,12 @@ uint8_t DS18B20_ReadScrachpad(uint8_t* addr, uint8_t* buf) {
 }
 
 
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
+/**
+ * @brief   Writes a buffer data to the given device.
+ * @param   addr a pointer to address of the given device
+ * @param   buf a pointer to buffer with the data to write
+ * @retval  (uint8_t) status of operation
+ */
 uint8_t DS18B20_WriteScratchpad(uint8_t* addr, uint8_t* buf) {
   if (OneWire_MatchROM(addr)) return 1;
   OneWire_WriteByte(WriteScratchpad);
@@ -45,10 +53,11 @@ uint8_t DS18B20_WriteScratchpad(uint8_t* addr, uint8_t* buf) {
 }
 
 
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
+/**
+ * @brief   Writes the convert temperature command to the given device.
+ * @param   addr a pointer to address of the given device
+ * @retval  (uint8_t) status of operation
+ */
 uint8_t DS18B20_ConvertTemperature(uint8_t* addr) {
   if (OneWire_MatchROM(addr)) return 1;
   uint8_t pps = OneWire_ReadPowerSupply(addr);
@@ -58,7 +67,7 @@ uint8_t DS18B20_ConvertTemperature(uint8_t* addr) {
   
   if (pps) {
     OW_SP_UP;
-    /* TODO implement a proper pause of 750ms */
+    _delay_ms(750, &_DSREG_, _DSDF_);
     OW_SP_DOWN;
   } else {
     /* TDOD implement timeout, handle independently */
@@ -69,10 +78,11 @@ uint8_t DS18B20_ConvertTemperature(uint8_t* addr) {
 }
 
 
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
+/**
+ * @brief   Copies the scratchpad data of the given device.
+ * @param   addr a pointer to address of the given device
+ * @retval  (uint8_t) status of operation
+ */
 uint8_t DS18B20_CopyScratchpad(uint8_t* addr) {
   if (OneWire_MatchROM(addr)) return 1;
   uint8_t pps = OneWire_ReadPowerSupply(addr);
@@ -82,7 +92,7 @@ uint8_t DS18B20_CopyScratchpad(uint8_t* addr) {
 
   if (pps) {
     OW_SP_UP;
-    /* TODO implement a proper pause of 10ms */
+    _delay_ms(10, &_DSREG_, _DSDF_);
     OW_SP_DOWN;
   } else {
     /* TDOD implement timeout, handle independently */
@@ -93,10 +103,11 @@ uint8_t DS18B20_CopyScratchpad(uint8_t* addr) {
 }
 
 
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
+/**
+ * @brief   Recalls the EEPROM data of the given device.
+ * @param   addr a pointer to address of the given device
+ * @retval  (uint8_t) status of operation
+ */
 uint8_t DS18B20_RecallEeprom(uint8_t* addr) {
   if (OneWire_MatchROM(addr)) return 1;
   OneWire_WriteByte(RecallEeprom);
@@ -105,4 +116,10 @@ uint8_t DS18B20_RecallEeprom(uint8_t* addr) {
   while(!OneWire_ReadBit());
   
   return 0;
+}
+
+
+/* Getters */
+volatile uint8_t* Get_DSREG(void) {
+  return &_DSREG_;
 }

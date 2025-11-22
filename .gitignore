@@ -10,8 +10,7 @@
 *.srec
 *.eep
 *.cproj
-Debug/Makefile
-Debug/*.mk
+Debug/
 *.d
 *.o
 .vs
