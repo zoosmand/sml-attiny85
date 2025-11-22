@@ -26,8 +26,8 @@ static uint8_t GetTemperatur_Handler(uint8_t);
  * @retval  (uint8_t) status of operation
  */
 uint8_t GetTemperature_Scheduler(void) {
-  _dsreg = Get_DSREG();
-  if (FLAG_CHECK(*_dsreg, _DSDF_)) return 1;
+  if (!FLAG_CHECK(*Get_PREG(), _OWBUSRF_)) return 1;
+  if (FLAG_CHECK(*Get_DSREG(), _DSDF_)) return 1;
 
   if (!(--taskCnt)) {
     _owreg = Get_OWREG();
@@ -64,6 +64,10 @@ static uint8_t GetTemperatur_Handler(uint8_t num) {
 
 /* Getters */
 uint8_t* Get_Spad(void) {
+  if (!FLAG_CHECK(*Get_PREG(), _OWBUSRF_)) {
+    spad[0] = 0x00;
+    spad[1] = 0x08;
+  }
   return spad;
 }
 

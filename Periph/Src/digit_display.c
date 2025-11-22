@@ -99,6 +99,10 @@ static void Dd_WriteByte(uint8_t byte) {
  * @retval (uint8_t) the operation status
  */
 uint8_t Init_DigitalDisplay(void) {
+  /* OneWire bus and Display share PB4 pin
+     if OneWire on board display to be ignored */
+  if (FLAG_CHECK(*Get_PREG(), _OWBUSRF_)) return 1;
+
   _INIT_DIGIT_DSPL;
   Dd_Start();
   Dd_WriteByte(0x40);

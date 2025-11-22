@@ -18,9 +18,14 @@
 #define SEC_TICK_MASK   0x03ff
 
 
-/* Flags definitions */
+/* System flag definitions */
 #define _SYSTF_   0 // System Tick Flag
 #define _SECTF_   1 // Seconds Tick Flag
+
+/* Peripherals rediness flag definitions */
+#define _DSPLRF_  0 // Display Ready Flag
+#define _DIGDRF_  1 // Digital Display Ready Flag
+#define _OWBUSRF_ 2 // OneWire Bus Ready Flag
 
 
 #endif /* DEF_H_ */

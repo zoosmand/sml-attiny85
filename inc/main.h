@@ -26,6 +26,7 @@
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
 #include <avr/wdt.h>
+#include <avr/iotn85.h>
 
 #include "def.h"
 #include "macroses.h"
@@ -46,6 +47,7 @@
 
 /* Exported functions */
 volatile uint8_t* Get_GREG(void);
+volatile uint8_t* Get_PREG(void);
 volatile uint16_t* Get_SysCnt(void);
 volatile uint16_t Get_SecCnt(void);
 
