@@ -12,6 +12,7 @@
 
 /* Private variables */
 static volatile uint8_t   _GREG_  = 0;
+static volatile uint8_t   _PREG_  = 0;
 static volatile uint16_t  sysCnt  = 0;
 static volatile uint16_t  secCnt  = 0;
 
@@ -38,9 +39,9 @@ int main(void) {
   _INIT_TIMERS;
   _INIT_I2C;
   Init_ISR();
-  Init_Display();
-  // Init_DigitalDisplay();
-  Init_OneWire();
+  if (!Init_Display())  FLAG_SET(_PREG_, _DSPLRF_);
+  if (!Init_OneWire()) FLAG_SET(_PREG_, _OWBUSRF_);
+  if (!Init_DigitalDisplay()) FLAG_SET(_PREG_, _DIGDRF_);
   sei();
 
   /* --- Init default standard output into display --- */
@@ -68,19 +69,22 @@ static void Cron(void) {
  * @retval  none
  */
 static void SysTick_Handler(void) {
-  cli();
+  /* Increase SysTick counter */
   if (FLAG_CHECK(_GREG_, _SYSTF_)) {
+    cli();
     FLAG_CLR(_GREG_, _SYSTF_);
     sysCnt &= SEC_TICK_MASK;
-
+    
     if (!sysCnt) {
       secCnt++;
       FLAG_SET(_GREG_, _SECTF_);
     }
+    sei();
+
     /* --- Millis dependent services --- */
     LedToggle_Scheduler();
+    PrintDigitalDisplay_Scheduler();
   }
-  sei();
 }
 
 
@@ -94,7 +98,6 @@ static void Second_Handler(void) {
     
     /* --- Seconds dependent services --- */
     Print_Scheduler();
-    // PrintDigitalDisplay_Scheduler();
     GetTemperature_Scheduler();
   }
 }
@@ -120,6 +123,10 @@ void _delay_ms(uint16_t delay, volatile uint8_t* reg, uint8_t flag) {
 /* Getters */
 volatile uint8_t* Get_GREG(void) {
   return &_GREG_;
+}
+
+volatile uint8_t* Get_PREG(void) {
+  return &_PREG_;
 }
 
 volatile uint16_t* Get_SysCnt(void) {

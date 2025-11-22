@@ -1,0 +1,32 @@
+{
+    "configurations": [
+        {
+            "name": "Win",
+            "includePath": [
+                "C:/Program Files (x86)/Atmel/Studio/7.0/packs/atmel/ATtiny_DFP/1.10.348/include",
+                "C:/Program Files (x86)/Atmel/Studio/7.0/packs/atmel/ATtiny_DFP/1.10.348/gcc/dev/attiny85",
+                "C:/Program Files (x86)/Atmel/Studio/7.0/toolchain/avr8/avr8-gnu-toolchain/avr/include",
+                "C:/Program Files (x86)/Atmel/Studio/7.0/toolchain/avr8/avr8-gnu-toolchain/lib/gcc/avr/5.4.0/include",
+                "C:/Program Files (x86)/Atmel/Studio/7.0/toolchain/avr8/avr8-gnu-toolchain/lib/gcc/avr/5.4.0/include-fixed",
+                "${workspaceRoot}/inc",
+                "${workspaceRoot}/Fonts/Inc",
+                "${workspaceRoot}/Periph/Inc",
+                "${workspaceRoot}/Tasks/Inc"
+            ],
+            "defines": [
+                "DEBUG"
+            ],
+            "intelliSenseMode": "gcc-x64",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "browse": {
+                "path": [
+                    "${workspaceRoot}"
+                ],
+                "limitSymbolsToIncludedHeaders": false,
+                "databaseFilename": ""
+            }
+        }
+    ],
+    "version": 4
+}

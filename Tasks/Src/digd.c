@@ -23,7 +23,9 @@ static uint8_t PrintDigitalDisplay_Handler(void);
  */
 uint8_t PrintDigitalDisplay_Scheduler(void) {
   if (!(--taskCnt)) {
-    if (PrintDigitalDisplay_Handler()) return 1;
+    if (FLAG_CHECK(*Get_PREG(), _DIGDRF_)) {
+      if (PrintDigitalDisplay_Handler()) return 1;
+    }
     taskCnt = DIGD_SRV_STEP;
   }
   return 0;

@@ -19,7 +19,7 @@
 #define LED0PIN   PINB1
 
 /* --- Periodial step value --- */
-#define LED_SRV_STEP  50 // here is a sec value that derives from secCnt
+#define LED_SRV_STEP  500 // here is a sec value that derives from sysCnt
 
 
 uint8_t LedToggle_Scheduler(void);

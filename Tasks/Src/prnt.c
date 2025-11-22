@@ -25,10 +25,12 @@ static uint8_t PrintTmpr_Handler(void);
  */
 uint8_t Print_Scheduler(void) {
   if (!(--taskCnt)) {
-    if (Get_SecCnt() % 5) {
-      if (PrintSec_Handler()) return 1;
-    } else {
-      if (PrintTmpr_Handler()) return 1;
+    if (FLAG_CHECK(*Get_PREG(), _DSPLRF_)) {
+      if (Get_SecCnt() % 5) {
+        if (PrintSec_Handler()) return 1;
+      } else {
+        if (PrintTmpr_Handler()) return 1;
+      }
     }
     taskCnt = PRNT_SRV_STEP;
   }
